@@ -1,31 +1,36 @@
 # 🚀 Quick Start Guide
 
-Get started with the UI Discovery System in 5 minutes!
+Get started with UI Scout in 5 minutes!
 
 ## Prerequisites
 
-- Node.js 16+ or Bun
+- Node.js 18+ or Bun
 - TypeScript 4.5+
-- A web application to test
+- A testing framework (Playwright, Puppeteer, or Selenium)
 
 ## Installation
 
-### NPM
+### Core Package
 ```bash
+# Using Bun (recommended)
+bun add ui-scout
+
+# Using npm
 npm install ui-scout
 ```
 
-### Bun
-```bash
-bun add ui-scout
-```
+### Framework Dependencies
+Choose **one** testing framework:
 
-### From Source
 ```bash
-git clone https://github.com/your-org/ui-discovery.git
-cd ui-discovery
-npm install
-npm run build
+# Playwright (recommended)
+bun add playwright
+
+# Puppeteer
+bun add puppeteer
+
+# Selenium WebDriver
+bun add selenium-webdriver
 ```
 
 ## Basic Usage
@@ -33,22 +38,21 @@ npm run build
 ### 1. Simple Discovery (Playwright)
 
 ```typescript
+import { createDiscoverySystem } from 'ui-scout';
 import { chromium } from 'playwright';
-import { DiscoveryService, PlaywrightPageDriver } from 'ui-scout';
 
 async function discoverFeatures() {
   const browser = await chromium.launch();
   const page = await browser.newPage();
   await page.goto('https://your-app.com');
   
-  // Create page driver and discovery service
-  const pageDriver = new PlaywrightPageDriver(page);
-  const discoveryService = new DiscoveryService(pageDriver);
+  // Auto-detects framework and creates appropriate adapter
+  const discoveryService = createDiscoverySystem(page, 'playwright');
   
   // Run discovery
   const features = await discoveryService.discoverAllFeatures();
   
-  console.log(`Found ${features.length} features`);
+  console.log(`Found ${features.length} UI features:`);
   features.forEach(feature => {
     console.log(`- ${feature.name} (${feature.type})`);
   });
@@ -59,51 +63,56 @@ async function discoverFeatures() {
 discoverFeatures();
 ```
 
-### 2. With Test Generation
+### 2. Complete Discovery with Testing
 
 ```typescript
 import { FeatureDiscoveryCoordinator } from 'ui-scout';
+import { chromium } from 'playwright';
 
-// Note: FeatureDiscoveryCoordinator currently works directly with Playwright Page
-const coordinator = new FeatureDiscoveryCoordinator(page);
+async function fullDiscovery() {
+  const browser = await chromium.launch();
+  const page = await browser.newPage();
+  await page.goto('https://your-app.com');
 
-const result = await coordinator.runComplete();
+  const coordinator = new FeatureDiscoveryCoordinator(page);
+  
+  // Run complete discovery + testing + reporting
+  const result = await coordinator.runComplete();
 
-// Access test results
-console.log(`Generated ${result.testing?.testCases.length || 0} test cases`);
-console.log(`Passed: ${result.testing?.passed || 0}/${result.testing?.executed || 0}`);
+  console.log(`Discovery Results:`);
+  console.log(`- Found ${result.discovery.count} features`);
+  console.log(`- Generated ${result.testing?.testCases.length || 0} test cases`);
+  console.log(`- Test success rate: ${result.testing?.successRate || 0}%`);
+
+  await browser.close();
+}
 ```
 
-### 3. Custom Discovery Only
-
-```typescript
-// Just discover features, no testing
-const features = await discoveryService.discoverAllFeatures();
-
-console.log('Features found:');
-features.forEach(feature => {
-  console.log(`- ${feature.name} (${feature.type})`);
-});
-```
-
-### 4. With Different Frameworks
+### 3. Framework-Specific Examples
 
 #### Puppeteer
 ```typescript
-import { PuppeteerPageDriver } from 'ui-scout';
+import { createDiscoverySystem } from 'ui-scout';
+import puppeteer from 'puppeteer';
 
-const pageDriver = new PuppeteerPageDriver(puppeteerPage);
-const discoveryService = new DiscoveryService(pageDriver);
+const browser = await puppeteer.launch();
+const page = await browser.newPage();
+await page.goto('https://your-app.com');
+
+const discoveryService = createDiscoverySystem(page, 'puppeteer');
+const features = await discoveryService.discoverAllFeatures();
 ```
 
-#### Using Factory Function
+#### Selenium WebDriver
 ```typescript
-import { createDiscoverySystem } from 'ui-scout';
+import { DiscoveryService } from 'ui-scout';
+import { Builder } from 'selenium-webdriver';
 
-// Automatically creates appropriate adapter
-const discoveryService = createDiscoverySystem(page, 'playwright');
-// or
-const discoveryService = createDiscoverySystem(puppeteerPage, 'puppeteer');
+const driver = await new Builder().forBrowser('chrome').build();
+await driver.get('https://your-app.com');
+
+// Note: Selenium adapter coming soon
+// const discoveryService = createDiscoverySystem(driver, 'selenium');
 ```
 
 ## Configuration Options

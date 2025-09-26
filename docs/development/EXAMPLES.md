@@ -1,14 +1,13 @@
-# 💻 Code Examples
+# 🛠️ Usage Examples
 
-Practical examples of using the UI Discovery System.
+Real-world examples of using UI Scout in different scenarios.
 
 ## Basic Examples
 
 ### 1. Simple Feature Discovery
 
 ```typescript
-import { FeatureDiscoveryCoordinator } from '@your-org/ui-discovery';
-import { PlaywrightAdapter } from '@your-org/ui-discovery/adapters';
+import { createDiscoverySystem } from 'ui-scout';
 import { chromium } from 'playwright';
 
 async function basicDiscovery() {
@@ -16,36 +15,31 @@ async function basicDiscovery() {
   const page = await browser.newPage();
   await page.goto('https://example.com');
   
-  const coordinator = new FeatureDiscoveryCoordinator(
-    new PlaywrightAdapter(page)
-  );
+  const discoveryService = createDiscoverySystem(page, 'playwright');
+  const features = await discoveryService.discoverAllFeatures();
   
-  const discovery = await coordinator.discoverFeatures();
-  
-  console.log('Features found:', discovery.count);
-  console.log('By type:', discovery.byType);
+  console.log('Features found:', features.length);
+  console.log('By type:', features.reduce((acc, f) => {
+    acc[f.type] = (acc[f.type] || 0) + 1;
+    return acc;
+  }, {}));
   
   await browser.close();
 }
 ```
 
-### 2. Discovery with Test Execution
+### 2. Discovery with Test Generation & Execution
 
 ```typescript
+import { FeatureDiscoveryCoordinator } from 'ui-scout';
+import { chromium } from 'playwright';
+
 async function discoveryWithTests() {
   const browser = await chromium.launch({ headless: false });
   const page = await browser.newPage();
   await page.goto('https://your-app.com');
   
-  const coordinator = new FeatureDiscoveryCoordinator(
-    new PlaywrightAdapter(page),
-    {
-      includeTestExecution: true,
-      screenshotPath: './screenshots',
-      timeout: 60000
-    }
-  );
-  
+  const coordinator = new FeatureDiscoveryCoordinator(page);
   const result = await coordinator.runComplete();
   
   // Check results
@@ -54,129 +48,173 @@ async function discoveryWithTests() {
   console.log(`
     Discovery Results:
     - Features: ${discovery.count}
-    - Interactive: ${discovery.features.filter(f => f.interactions.length > 0).length}
+    - Interactive: ${discovery.features.filter(f => f.actions?.length > 0).length}
     
     Testing Results:
-    - Test Cases: ${testing.testCases.length}
-    - Passed: ${testing.passed}
-    - Failed: ${testing.failed}
+    - Test Cases: ${testing?.testCases.length || 0}
+    - Passed: ${testing?.successRate || 0}%
     
     Analysis Results:
-    - Accessibility Score: ${analysis.accessibility.score}/100
-    - Page Title: ${analysis.structure.title}
+    - Page Title: ${analysis?.pageTitle || 'Unknown'}
   `);
   
   await browser.close();
 }
 ```
 
-## Advanced Examples
-
-### 3. Custom Discovery Module
+### 3. Manual Test Generation
 
 ```typescript
-import { BaseDiscovery } from '@your-org/ui-discovery';
+import { 
+  createDiscoverySystem, 
+  TestCaseGenerator, 
+  TestExecutor,
+  ReportGenerator 
+} from 'ui-scout';
 
-class VideoPlayerDiscovery extends BaseDiscovery {
-  async discover(driver: IPageDriver): Promise<Feature[]> {
-    const features: Feature[] = [];
-    
-    // Find all video players
-    const videos = await driver.querySelectorAll('video');
-    
-    for (const video of videos) {
-      const id = await driver.getAttribute(video, 'id');
-      const src = await driver.getAttribute(video, 'src');
-      
-      features.push({
-        id: id || `video-${features.length}`,
-        name: `Video Player ${features.length + 1}`,
-        type: 'video-player',
-        selector: `video[src="${src}"]`,
-        attributes: { src },
-        interactions: [
-          { type: 'play', description: 'Play video' },
-          { type: 'pause', description: 'Pause video' },
-          { type: 'seek', description: 'Seek to position' }
-        ],
-        metadata: {
-          category: 'media',
-          importance: 'high'
-        }
-      });
-    }
-    
-    return features;
-  }
+async function manualTesting() {
+  const browser = await chromium.launch();
+  const page = await browser.newPage();
+  await page.goto('https://your-app.com');
+
+  // Discover features
+  const discoveryService = createDiscoverySystem(page, 'playwright');
+  const features = await discoveryService.discoverAllFeatures();
+
+  // Generate test cases
+  const generator = new TestCaseGenerator();
+  const testCases = await generator.generateFromFeatures(features);
+
+  // Execute tests
+  const executor = new TestExecutor(page);
+  const results = await executor.executeTestCases(testCases);
+
+  // Generate reports
+  const reportGenerator = new ReportGenerator();
+  await reportGenerator.generateHTMLReport(features, testCases, results, 'test-report.html');
+  await reportGenerator.generateMarkdownSummary(features, testCases, results, 'summary.md');
+
+  console.log(`Generated ${testCases.length} tests, ${results.filter(r => r.success).length} passed`);
+  
+  await browser.close();
 }
-
-// Use custom discovery
-const discoveryService = new DiscoveryService(adapter);
-discoveryService.registerModule(new VideoPlayerDiscovery());
-const features = await discoveryService.discover();
 ```
 
-### 4. Parallel Discovery Across Multiple Pages
+## Framework Examples
+
+### Playwright Integration
+
+```typescript
+// tests/ui-discovery.spec.ts
+import { test, expect } from '@playwright/test';
+import { createDiscoverySystem } from 'ui-scout';
+
+test('UI discovery integration', async ({ page }) => {
+  await page.goto('/dashboard');
+  
+  const discoveryService = createDiscoverySystem(page, 'playwright');
+  const features = await discoveryService.discoverAllFeatures();
+  
+  // Verify expected features exist
+  expect(features.length).toBeGreaterThan(0);
+  
+  const loginButton = features.find(f => f.name.toLowerCase().includes('login'));
+  expect(loginButton).toBeDefined();
+  
+  const forms = features.filter(f => f.type === 'input');
+  expect(forms.length).toBeGreaterThan(0);
+});
+```
+
+### Puppeteer Integration
+
+```typescript
+import { createDiscoverySystem } from 'ui-scout';
+import puppeteer from 'puppeteer';
+
+async function puppeteerExample() {
+  const browser = await puppeteer.launch();
+  const page = await browser.newPage();
+  await page.goto('https://your-app.com');
+
+  const discoveryService = createDiscoverySystem(page, 'puppeteer');
+  const features = await discoveryService.discoverAllFeatures();
+
+  console.log(`Puppeteer discovered ${features.length} features`);
+  
+  await browser.close();
+}
+```
+
+### Multi-Page Discovery
 
 ```typescript
 async function discoverMultiplePages(urls: string[]) {
   const browser = await chromium.launch();
   
-  // Run discovery in parallel for all URLs
   const results = await Promise.all(
     urls.map(async (url) => {
       const page = await browser.newPage();
       await page.goto(url);
       
-      const coordinator = new FeatureDiscoveryCoordinator(
-        new PlaywrightAdapter(page)
-      );
+      const discoveryService = createDiscoverySystem(page, 'playwright');
+      const features = await discoveryService.discoverAllFeatures();
       
-      const result = await coordinator.runComplete();
       await page.close();
-      
-      return { url, result };
+      return { url, features: features.length };
     })
   );
   
-  // Aggregate results
-  const totalFeatures = results.reduce(
-    (sum, { result }) => sum + result.discovery.count,
-    0
+  console.log('Multi-page results:', results);
+  await browser.close();
+}
+
+// Usage
+discoverMultiplePages([
+  'https://myapp.com/',
+  'https://myapp.com/dashboard',
+  'https://myapp.com/settings'
+]);
+```
+
+## Advanced Usage
+
+### Custom Discovery with Filtering
+
+```typescript
+import { DiscoveryService, PlaywrightPageDriver } from 'ui-scout';
+
+async function customDiscovery() {
+  const browser = await chromium.launch();
+  const page = await browser.newPage();
+  await page.goto('https://your-app.com');
+
+  const pageDriver = new PlaywrightPageDriver(page);
+  const discoveryService = new DiscoveryService(pageDriver);
+
+  // Discover specific types only
+  const buttons = await discoveryService.discoverButtons();
+  const inputs = await discoveryService.discoverInputs();
+  
+  // Filter by criteria
+  const primaryButtons = buttons.filter(b => 
+    b.attributes?.class?.includes('primary') || 
+    b.attributes?.type === 'submit'
   );
-  
-  console.log(`Discovered ${totalFeatures} features across ${urls.length} pages`);
-  
-  // Generate combined report
-  const report = {
-    timestamp: new Date().toISOString(),
-    pages: results.map(({ url, result }) => ({
-      url,
-      features: result.discovery.count,
-      tests: result.testing.testCases.length,
-      accessibility: result.analysis.accessibility.score
-    })),
-    summary: {
-      totalPages: urls.length,
-      totalFeatures,
-      averageAccessibility: 
-        results.reduce((sum, { result }) => 
-          sum + result.analysis.accessibility.score, 0
-        ) / urls.length
-    }
-  };
+
+  console.log(`Found ${primaryButtons.length} primary buttons`);
   
   await browser.close();
-  return report;
 }
 ```
 
-### 5. CI/CD Integration
+### CI/CD Integration
 
 ```typescript
-// ci-discovery.ts
-import { FeatureDiscoveryCoordinator } from '@your-org/ui-discovery';
-import { PlaywrightAdapter } from '@your-org/ui-discovery/adapters';
+// scripts/ui-audit.ts
+import { FeatureDiscoveryCoordinator } from 'ui-scout';
+import { chromium } from 'playwright';
+import * as fs from 'fs';
 
 async function ciPipeline() {
   const BASE_URL = process.env.TEST_URL || 'http://localhost:3000';
@@ -192,21 +230,14 @@ async function ciPipeline() {
   const page = await browser.newPage();
   await page.goto(BASE_URL);
   
-  const coordinator = new FeatureDiscoveryCoordinator(
-    new PlaywrightAdapter(page),
-    {
-      includeTestExecution: true,
-      parallel: true
-    }
-  );
-  
+  const coordinator = new FeatureDiscoveryCoordinator(page);
   const result = await coordinator.runComplete();
   
   // Compare with baseline
   if (baseline) {
     const regressions = [];
     
-    // Check for missing features
+    // Check feature count
     if (result.discovery.count < baseline.discovery.count) {
       regressions.push(
         `Feature count decreased: ${baseline.discovery.count} → ${result.discovery.count}`
@@ -214,19 +245,12 @@ async function ciPipeline() {
     }
     
     // Check test pass rate
-    const passRate = (result.testing.passed / result.testing.executed) * 100;
-    const baselinePassRate = (baseline.testing.passed / baseline.testing.executed) * 100;
+    const passRate = result.testing?.successRate || 0;
+    const baselinePassRate = baseline.testing?.successRate || 0;
     
     if (passRate < baselinePassRate - 5) {
       regressions.push(
-        `Test pass rate decreased: ${baselinePassRate.toFixed(1)}% → ${passRate.toFixed(1)}%`
-      );
-    }
-    
-    // Check accessibility
-    if (result.analysis.accessibility.score < baseline.analysis.accessibility.score - 5) {
-      regressions.push(
-        `Accessibility score decreased: ${baseline.analysis.accessibility.score} → ${result.analysis.accessibility.score}`
+        `Test pass rate decreased: ${baselinePassRate}% → ${passRate}%`
       );
     }
     
@@ -250,159 +274,32 @@ async function ciPipeline() {
 ciPipeline().catch(console.error);
 ```
 
-### 6. Custom Report Generation
+### Report Generation
 
 ```typescript
-import { ReportGenerator } from '@your-org/ui-discovery';
+import { ReportGenerator } from 'ui-scout';
 
-class JUnitReporter extends ReportGenerator {
-  async generate(data: any): Promise<void> {
-    const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<testsuites name="UI Discovery Tests" tests="${data.testing.executed}" failures="${data.testing.failed}">
-  <testsuite name="Feature Tests" tests="${data.testing.executed}" failures="${data.testing.failed}">
-    ${data.testing.results.map(result => `
-    <testcase name="${result.testCase.name}" classname="${result.testCase.feature.type}" time="${result.duration / 1000}">
-      ${!result.passed ? `<failure message="${result.error?.message}">${result.error?.stack}</failure>` : ''}
-    </testcase>
-    `).join('')}
-  </testsuite>
-</testsuites>`;
-    
-    await fs.promises.writeFile('junit-report.xml', xml);
-  }
-}
+async function generateReports(features: any[], testCases: any[], results: any[]) {
+  const generator = new ReportGenerator();
 
-// Use custom reporter
-const coordinator = new FeatureDiscoveryCoordinator(adapter);
-const result = await coordinator.runComplete();
+  // Generate different report formats
+  await generator.generateJSONReport(features, 'discovery.json');
+  await generator.generateHTMLReport(features, testCases, results, 'report.html');
+  await generator.generateMarkdownSummary(features, testCases, results, 'summary.md');
 
-const junitReporter = new JUnitReporter();
-await junitReporter.generate(result);
-```
-
-### 7. Feature Comparison
-
-```typescript
-async function compareVersions(v1Url: string, v2Url: string) {
-  const browser = await chromium.launch();
-  
-  // Discover v1
-  const page1 = await browser.newPage();
-  await page1.goto(v1Url);
-  const v1Coordinator = new FeatureDiscoveryCoordinator(
-    new PlaywrightAdapter(page1)
-  );
-  const v1Result = await v1Coordinator.discoverFeatures();
-  await page1.close();
-  
-  // Discover v2
-  const page2 = await browser.newPage();
-  await page2.goto(v2Url);
-  const v2Coordinator = new FeatureDiscoveryCoordinator(
-    new PlaywrightAdapter(page2)
-  );
-  const v2Result = await v2Coordinator.discoverFeatures();
-  await page2.close();
-  
-  // Compare features
-  const v1Ids = new Set(v1Result.features.map(f => f.id));
-  const v2Ids = new Set(v2Result.features.map(f => f.id));
-  
-  const added = v2Result.features.filter(f => !v1Ids.has(f.id));
-  const removed = v1Result.features.filter(f => !v2Ids.has(f.id));
-  const unchanged = v2Result.features.filter(f => v1Ids.has(f.id));
-  
-  console.log(`
-    Feature Comparison:
-    - Added: ${added.length}
-    - Removed: ${removed.length}
-    - Unchanged: ${unchanged.length}
-    
-    Added Features:
-    ${added.map(f => `  + ${f.name} (${f.type})`).join('\\n')}
-    
-    Removed Features:
-    ${removed.map(f => `  - ${f.name} (${f.type})`).join('\\n')}
-  `);
-  
-  await browser.close();
-  
-  return { added, removed, unchanged };
+  console.log('Reports generated successfully');
 }
 ```
 
-### 8. Interactive Mode
+## Integration Patterns
+
+### Next.js API Route
 
 ```typescript
-import * as readline from 'readline';
-
-async function interactiveDiscovery() {
-  const browser = await chromium.launch({ headless: false });
-  const page = await browser.newPage();
-  
-  const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-  });
-  
-  const question = (prompt: string) => new Promise<string>(resolve => {
-    rl.question(prompt, resolve);
-  });
-  
-  while (true) {
-    const url = await question('Enter URL (or "quit" to exit): ');
-    
-    if (url === 'quit') break;
-    
-    await page.goto(url);
-    
-    const coordinator = new FeatureDiscoveryCoordinator(
-      new PlaywrightAdapter(page)
-    );
-    
-    const action = await question('Choose action (discover/test/analyze/all): ');
-    
-    switch (action) {
-      case 'discover':
-        const discovery = await coordinator.discoverFeatures();
-        console.log('Found features:', discovery.features.map(f => f.name));
-        break;
-        
-      case 'test':
-        const features = await coordinator.discoverFeatures();
-        const tests = await coordinator.generateTests(features.features);
-        const results = await coordinator.executeTests(tests.slice(0, 5));
-        console.log('Test results:', results.map(r => 
-          `${r.testCase.name}: ${r.passed ? '✅' : '❌'}`
-        ));
-        break;
-        
-      case 'analyze':
-        const analysis = await coordinator.analyzePage();
-        console.log('Page analysis:', analysis);
-        break;
-        
-      case 'all':
-        const complete = await coordinator.runComplete();
-        console.log('Complete results:', complete);
-        break;
-    }
-  }
-  
-  rl.close();
-  await browser.close();
-}
-```
-
-## Framework-Specific Examples
-
-### Next.js Integration
-
-```typescript
-// pages/api/discovery.ts
+// pages/api/ui-discovery.ts
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { FeatureDiscoveryCoordinator } from '@your-org/ui-discovery';
-import { PlaywrightAdapter } from '@your-org/ui-discovery/adapters';
+import { createDiscoverySystem } from 'ui-scout';
+import { chromium } from 'playwright';
 
 export default async function handler(
   req: NextApiRequest,
@@ -414,49 +311,165 @@ export default async function handler(
   
   const { url } = req.body;
   
-  const browser = await chromium.launch();
-  const page = await browser.newPage();
-  await page.goto(url);
-  
-  const coordinator = new FeatureDiscoveryCoordinator(
-    new PlaywrightAdapter(page)
-  );
-  
-  const result = await coordinator.runComplete();
-  
-  await browser.close();
-  
-  res.status(200).json(result);
+  try {
+    const browser = await chromium.launch();
+    const page = await browser.newPage();
+    await page.goto(url);
+    
+    const discoveryService = createDiscoverySystem(page, 'playwright');
+    const features = await discoveryService.discoverAllFeatures();
+    
+    await browser.close();
+    
+    res.status(200).json({ 
+      success: true, 
+      features: features.length,
+      data: features 
+    });
+  } catch (error) {
+    res.status(500).json({ 
+      success: false, 
+      error: error.message 
+    });
+  }
 }
 ```
 
-### React Component Testing
+### Jest Test Integration
 
 ```typescript
-// ComponentDiscovery.test.tsx
-import { render } from '@testing-library/react';
-import { FeatureDiscoveryCoordinator } from '@your-org/ui-discovery';
-import { JSDOMAdapter } from '@your-org/ui-discovery/adapters';
+// __tests__/ui-discovery.test.js
+import { createDiscoverySystem } from 'ui-scout';
+import { chromium } from 'playwright';
 
-describe('Component Discovery', () => {
-  it('discovers all interactive elements', async () => {
-    const { container } = render(<MyComplexForm />);
+describe('UI Discovery Tests', () => {
+  let browser, page;
+
+  beforeAll(async () => {
+    browser = await chromium.launch();
+  });
+
+  afterAll(async () => {
+    await browser.close();
+  });
+
+  beforeEach(async () => {
+    page = await browser.newPage();
+  });
+
+  afterEach(async () => {
+    await page.close();
+  });
+
+  test('should discover login form', async () => {
+    await page.goto('http://localhost:3000/login');
     
-    const coordinator = new FeatureDiscoveryCoordinator(
-      new JSDOMAdapter(container)
+    const discoveryService = createDiscoverySystem(page, 'playwright');
+    const features = await discoveryService.discoverAllFeatures();
+    
+    const loginInputs = features.filter(f => 
+      f.type === 'input' && 
+      (f.name.includes('email') || f.name.includes('password'))
     );
     
-    const result = await coordinator.discoverFeatures();
+    expect(loginInputs.length).toBeGreaterThanOrEqual(2);
+  });
+
+  test('should discover navigation elements', async () => {
+    await page.goto('http://localhost:3000');
     
-    expect(result.byType.input).toBe(5);
-    expect(result.byType.button).toBe(2);
-    expect(result.byType.dropdown).toBe(1);
+    const discoveryService = createDiscoverySystem(page, 'playwright');
+    const features = await discoveryService.discoverAllFeatures();
+    
+    const navElements = features.filter(f => f.type === 'menu');
+    expect(navElements.length).toBeGreaterThan(0);
   });
 });
+```
+
+## Error Handling
+
+```typescript
+async function robustDiscovery() {
+  const browser = await chromium.launch();
+  
+  try {
+    const page = await browser.newPage();
+    
+    // Set timeout
+    page.setDefaultTimeout(30000);
+    
+    await page.goto('https://your-app.com', { 
+      waitUntil: 'networkidle' 
+    });
+    
+    const discoveryService = createDiscoverySystem(page, 'playwright');
+    const features = await discoveryService.discoverAllFeatures();
+    
+    if (features.length === 0) {
+      console.warn('No features discovered - page might not be fully loaded');
+    }
+    
+    return features;
+    
+  } catch (error) {
+    console.error('Discovery failed:', error.message);
+    return [];
+  } finally {
+    await browser.close();
+  }
+}
+```
+
+## Performance Optimization
+
+```typescript
+async function optimizedDiscovery() {
+  const browser = await chromium.launch({
+    args: ['--no-sandbox', '--disable-dev-shm-usage']
+  });
+  
+  const page = await browser.newPage();
+  
+  // Disable unnecessary resources for faster loading
+  await page.route('**/*.{png,jpg,jpeg,gif,svg}', route => route.abort());
+  await page.route('**/*.{css}', route => route.abort());
+  
+  await page.goto('https://your-app.com');
+  
+  const discoveryService = createDiscoverySystem(page, 'playwright');
+  const features = await discoveryService.discoverAllFeatures();
+  
+  await browser.close();
+  return features;
+}
+```
+
+## Monitoring & Alerting
+
+```typescript
+async function monitoringSetup() {
+  const results = await discoverFeatures();
+  
+  // Alert if feature count drops significantly
+  const expectedMinFeatures = 10;
+  if (results.length < expectedMinFeatures) {
+    // Send alert (Slack, email, etc.)
+    console.error(`⚠️ Low feature count: ${results.length} (expected: ${expectedMinFeatures}+)`);
+  }
+  
+  // Log metrics
+  console.log(JSON.stringify({
+    timestamp: new Date().toISOString(),
+    features_discovered: results.length,
+    page_url: 'https://your-app.com',
+    status: 'success'
+  }));
+}
 ```
 
 ## Next Steps
 
 - [API Reference](../api/CORE.md) - Complete API documentation
-- [Testing Guide](./TESTING.md) - Testing the discovery system
-- [Contributing](./CONTRIBUTING.md) - How to contribute
+- [Architecture Overview](../overview/ARCHITECTURE.md) - System design
+- [Configuration Guide](../technical/COMPLETE-GUIDE.md) - Advanced configuration
