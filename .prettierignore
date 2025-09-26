@@ -1,0 +1,11 @@
+dist
+node_modules
+coverage
+*.min.js
+*.d.ts
+.next
+.cache
+public
+package-lock.json
+bun.lockb
+pnpm-lock.yaml
