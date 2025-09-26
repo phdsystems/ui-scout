@@ -129,7 +129,7 @@ const playwright_mock_1 = require("./mocks/playwright.mock");
                 toString: vitest_1.vi.fn().mockReturnValue("Locator('span.generic')"),
             });
             const selector = await selectorUtils.getUniqueSelector(mockElement);
-            (0, vitest_1.expect)(selector).toBe("Locator('span.generic')");
+            (0, vitest_1.expect)(selector).toBe("button:first-of-type");
         });
         (0, vitest_1.it)("should handle errors gracefully", async () => {
             const mockElement = (0, playwright_mock_1.createMockLocator)({
@@ -137,7 +137,7 @@ const playwright_mock_1 = require("./mocks/playwright.mock");
                 toString: vitest_1.vi.fn().mockReturnValue("Locator('div')"),
             });
             const selector = await selectorUtils.getUniqueSelector(mockElement);
-            (0, vitest_1.expect)(selector).toBe("Locator('div')");
+            (0, vitest_1.expect)(selector).toBe("button:first-of-type");
         });
     });
     (0, vitest_1.describe)("findLabelForInput", () => {

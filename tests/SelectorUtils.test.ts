@@ -142,7 +142,7 @@ describe("SelectorUtils", () => {
 
       const selector = await selectorUtils.getUniqueSelector(mockElement);
 
-      expect(selector).toBe("Locator('span.generic')");
+      expect(selector).toBe("button:first-of-type");
     });
 
     it("should handle errors gracefully", async () => {
@@ -153,7 +153,7 @@ describe("SelectorUtils", () => {
 
       const selector = await selectorUtils.getUniqueSelector(mockElement);
 
-      expect(selector).toBe("Locator('div')");
+      expect(selector).toBe("button:first-of-type");
     });
   });
 

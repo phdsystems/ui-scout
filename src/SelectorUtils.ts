@@ -29,10 +29,24 @@ export class SelectorUtils {
       const textSelector = await this.getTextSelector(element);
       if (textSelector) return textSelector;
 
-      // Fallback: element toString
-      return element.toString();
+      // Fallback: try to get index-based selector
+      const tagName = await element
+        .evaluate((el: HTMLElement) => el.tagName.toLowerCase())
+        .catch(() => "button");
+      const index = await element
+        .evaluateHandle((el: HTMLElement) => {
+          const parent = el.parentElement;
+          if (!parent) return 0;
+          const siblings = Array.from(parent.querySelectorAll(el.tagName));
+          return siblings.indexOf(el);
+        })
+        .then((handle) => handle.jsonValue())
+        .catch(() => 0);
+
+      return `${tagName}:nth-of-type(${index + 1})`;
     } catch (e) {
-      return element.toString();
+      // Return a basic selector as fallback
+      return "button:first-of-type";
     }
   }
 

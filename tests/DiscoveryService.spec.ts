@@ -53,7 +53,7 @@ describe("DiscoveryService", () => {
   // Helper to create mock elements
   function createMockElement(data: any) {
     return {
-      evaluate: vi.fn().mockImplementation((fn: Function) => {
+      evaluate: vi.fn().mockImplementation((fn: (...args: any[]) => any) => {
         const el = {
           tagName: data.tagName?.toLowerCase() || "div",
           textContent: data.textContent || "",
@@ -152,15 +152,13 @@ describe("DiscoveryService", () => {
             };
           } else if (childSelector.includes("input")) {
             return {
-              all: vi
-                .fn()
-                .mockResolvedValue([
-                  createMockElement({
-                    tagName: "INPUT",
-                    type: "text",
-                    placeholder: "Container Input",
-                  }),
-                ]),
+              all: vi.fn().mockResolvedValue([
+                createMockElement({
+                  tagName: "INPUT",
+                  type: "text",
+                  placeholder: "Container Input",
+                }),
+              ]),
             };
           }
           return { all: vi.fn().mockResolvedValue([]) };
@@ -196,7 +194,7 @@ describe("DiscoveryService", () => {
       goto: vi.fn().mockResolvedValue(undefined),
       waitForLoadState: vi.fn().mockResolvedValue(undefined),
       locator: vi.fn().mockImplementation(createMockLocator),
-      evaluate: vi.fn().mockImplementation((fn: Function) => {
+      evaluate: vi.fn().mockImplementation((fn: (...args: any[]) => any) => {
         if (fn.toString().includes("getComputedStyle")) {
           return Promise.resolve({ visibility: "visible" });
         }

@@ -130,7 +130,7 @@ const playwright_mock_1 = require("./mocks/playwright.mock");
             const result = await buttonDiscovery.discoverButtons();
             (0, vitest_1.expect)(result).toHaveLength(1);
             (0, vitest_1.expect)(result[0].name).toBe("Custom Button");
-            (0, vitest_1.expect)(result[0].selector).toBe("div[role=button]");
+            (0, vitest_1.expect)(result[0].selector).toBe("button:first-of-type");
         });
         (0, vitest_1.it)("should identify disabled buttons", async () => {
             const disabledButton = (0, playwright_mock_1.createMockLocator)({

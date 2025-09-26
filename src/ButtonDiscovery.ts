@@ -64,6 +64,8 @@ export class ButtonDiscovery {
         type: "button",
         selector: uniqueSelector,
         text: text,
+        title: title || undefined,
+        ariaLabel: ariaLabel || undefined,
         attributes: {
           title: title || "",
           "aria-label": ariaLabel || "",

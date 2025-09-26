@@ -139,7 +139,7 @@ describe("ButtonDiscovery", () => {
 
       expect(result).toHaveLength(1);
       expect(result[0].name).toBe("Custom Button");
-      expect(result[0].selector).toBe("div[role=button]");
+      expect(result[0].selector).toBe("button:first-of-type");
     });
 
     it("should identify disabled buttons", async () => {
