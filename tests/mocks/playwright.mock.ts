@@ -47,6 +47,8 @@ export const createMockPage = (overrides?: Partial<any>) => {
     locator: vi.fn().mockReturnValue(mockLocator),
     $: vi.fn().mockResolvedValue(null),
     $$: vi.fn().mockResolvedValue([]),
+    $$eval: vi.fn().mockResolvedValue([]),
+    $eval: vi.fn().mockResolvedValue(undefined),
     evaluate: vi.fn().mockResolvedValue(undefined),
     evaluateHandle: vi.fn().mockResolvedValue(undefined),
     waitForSelector: vi.fn().mockResolvedValue(null),

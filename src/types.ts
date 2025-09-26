@@ -11,9 +11,17 @@ export interface DiscoveredFeature {
     | "modal"
     | "dropdown"
     | "tab"
+    | "navigation"
     | "other";
   selector: string;
   text?: string;
+  placeholder?: string; // Added for input elements
+  inputType?: string; // Added for input type specification
+  title?: string; // Added for button/element titles
+  ariaLabel?: string; // Added for accessibility
+  alt?: string; // Added for images
+  role?: string; // Added for ARIA roles
+  confidence?: number; // Added for discovery confidence scoring
   attributes?: Record<string, string>;
   children?: DiscoveredFeature[];
   actions?: string[];

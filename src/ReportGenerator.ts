@@ -257,7 +257,7 @@ interface ReportTestResult {
 
 function convertTestResults(results: TestResult[]): ReportTestResult[] {
   return results.map((result) => ({
-    featureName: result.testCase?.feature?.name || 'Unknown',
+    featureName: result.testCase?.feature?.name || "Unknown",
     passed: result.success,
     error: result.error || undefined,
   }));

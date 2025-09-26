@@ -1,0 +1,58 @@
+{
+  "timestamp": "2025-09-26T19:26:55.566Z",
+  "url": "https://example.com",
+  "featuresDiscovered": 4,
+  "features": [
+    {
+      "type": "button",
+      "name": "Button with text",
+      "selector": "#btn1",
+      "attributes": {
+        "type": "button",
+        "class": "primary"
+      },
+      "actions": [
+        "click"
+      ],
+      "text": "Click Me"
+    },
+    {
+      "type": "button",
+      "name": "Button without text",
+      "selector": "#btn2",
+      "attributes": {
+        "type": "button"
+      },
+      "actions": [
+        "click"
+      ]
+    },
+    {
+      "type": "input",
+      "name": "Input with no actions",
+      "selector": "#input1",
+      "attributes": {
+        "type": "text"
+      }
+    },
+    {
+      "type": "chart",
+      "name": "Chart without attributes",
+      "selector": ".chart",
+      "actions": [
+        "screenshot"
+      ]
+    }
+  ],
+  "testCases": [],
+  "statistics": {
+    "byType": {
+      "button": 2,
+      "input": 1,
+      "chart": 1
+    },
+    "interactive": 3,
+    "withText": 1,
+    "withAttributes": 3
+  }
+}
