@@ -69,3 +69,11 @@ export interface DiscoveryOptions {
   includeHidden?: boolean;
   screenshotPath?: string;
 }
+
+export interface TestExecutionResult {
+  testCase: TestCase;
+  success: boolean;
+  duration: number;
+  error: string | null;
+  screenshot: string | null;
+}

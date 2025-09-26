@@ -1,0 +1,68 @@
+export declare const createMockLocator: (overrides?: Partial<any>) => {
+    count: import("vitest").Mock<any, any>;
+    all: import("vitest").Mock<any, any>;
+    first: import("vitest").Mock<any, any>;
+    last: import("vitest").Mock<any, any>;
+    nth: import("vitest").Mock<any, any>;
+    filter: import("vitest").Mock<any, any>;
+    locator: import("vitest").Mock<any, any>;
+    isVisible: import("vitest").Mock<any, any>;
+    isEnabled: import("vitest").Mock<any, any>;
+    isDisabled: import("vitest").Mock<any, any>;
+    isChecked: import("vitest").Mock<any, any>;
+    getAttribute: import("vitest").Mock<any, any>;
+    textContent: import("vitest").Mock<any, any>;
+    innerText: import("vitest").Mock<any, any>;
+    innerHTML: import("vitest").Mock<any, any>;
+    evaluate: import("vitest").Mock<any, any>;
+    evaluateAll: import("vitest").Mock<any, any>;
+    click: import("vitest").Mock<any, any>;
+    fill: import("vitest").Mock<any, any>;
+    check: import("vitest").Mock<any, any>;
+    uncheck: import("vitest").Mock<any, any>;
+    selectOption: import("vitest").Mock<any, any>;
+    hover: import("vitest").Mock<any, any>;
+    focus: import("vitest").Mock<any, any>;
+    press: import("vitest").Mock<any, any>;
+    type: import("vitest").Mock<any, any>;
+    screenshot: import("vitest").Mock<any, any>;
+    scrollIntoViewIfNeeded: import("vitest").Mock<any, any>;
+    waitFor: import("vitest").Mock<any, any>;
+    boundingBox: import("vitest").Mock<any, any>;
+    toString: import("vitest").Mock<any, any>;
+};
+export declare const createMockPage: (overrides?: Partial<any>) => {
+    goto: import("vitest").Mock<any, any>;
+    url: import("vitest").Mock<any, any>;
+    title: import("vitest").Mock<any, any>;
+    locator: import("vitest").Mock<any, any>;
+    $: import("vitest").Mock<any, any>;
+    $$: import("vitest").Mock<any, any>;
+    evaluate: import("vitest").Mock<any, any>;
+    evaluateHandle: import("vitest").Mock<any, any>;
+    waitForSelector: import("vitest").Mock<any, any>;
+    waitForTimeout: import("vitest").Mock<any, any>;
+    waitForLoadState: import("vitest").Mock<any, any>;
+    screenshot: import("vitest").Mock<any, any>;
+    close: import("vitest").Mock<any, any>;
+    reload: import("vitest").Mock<any, any>;
+    goBack: import("vitest").Mock<any, any>;
+    goForward: import("vitest").Mock<any, any>;
+    setViewportSize: import("vitest").Mock<any, any>;
+};
+export declare const createMockElement: (tag: string, attributes?: Record<string, any>) => {
+    tagName: string;
+    getAttribute: (name: string) => any;
+    textContent: any;
+    innerText: any;
+    innerHTML: any;
+    classList: {
+        contains: (className: string) => any;
+    };
+    style: any;
+    disabled: any;
+    checked: any;
+    value: any;
+    href: any;
+};
+//# sourceMappingURL=playwright.mock.d.ts.map

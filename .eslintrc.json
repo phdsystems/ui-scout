@@ -3,8 +3,7 @@
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "ecmaVersion": 2022,
-    "sourceType": "module",
-    "project": "./tsconfig.json"
+    "sourceType": "module"
   },
   "plugins": ["@typescript-eslint", "prettier"],
   "extends": [
@@ -34,5 +33,5 @@
     "no-console": "off",
     "no-debugger": "error"
   },
-  "ignorePatterns": ["dist", "node_modules", "*.js", "*.cjs", "*.mjs"]
+  "ignorePatterns": ["dist", "node_modules", "*.js", "*.cjs", "*.mjs", "*.d.ts"]
 }

@@ -4,7 +4,7 @@ import { DiscoveryService } from "./DiscoveryService";
 import { TestingService } from "./TestingService";
 import { AnalysisService } from "./AnalysisService";
 import { ReportGenerator } from "./ReportGenerator";
-import type { TestExecutionResult } from "./TestExecutor";
+import type { TestExecutionResult } from "./types";
 
 /**
  * Lightweight coordinator that delegates to specialized services

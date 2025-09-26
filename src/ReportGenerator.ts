@@ -1,5 +1,10 @@
 import * as fs from "fs";
-import type { DiscoveredFeature, TestCase, DiscoveryReport } from "./types";
+import type {
+  DiscoveredFeature,
+  TestCase,
+  DiscoveryReport,
+  TestExecutionResult as TestResult,
+} from "./types";
 
 /**
  * Service class for generating discovery and test reports
@@ -28,10 +33,11 @@ export class ReportGenerator {
   async generateHtmlReport(
     features: DiscoveredFeature[],
     testCases: TestCase[],
-    testResults: TestExecutionResult[],
+    testResults: TestResult[],
     filename: string,
   ): Promise<void> {
-    const html = this.createHtmlReport(features, testCases, testResults);
+    const convertedResults = convertTestResults(testResults);
+    const html = this.createHtmlReport(features, testCases, convertedResults);
     await fs.promises.writeFile(filename, html);
     console.log(`📄 HTML report saved to ${filename}`);
   }
@@ -39,10 +45,11 @@ export class ReportGenerator {
   async generateMarkdownSummary(
     features: DiscoveredFeature[],
     testCases: TestCase[],
-    testResults: TestExecutionResult[],
+    testResults: TestResult[],
     filename: string,
   ): Promise<void> {
-    const markdown = this.createMarkdownReport(features, testCases, testResults);
+    const convertedResults = convertTestResults(testResults);
+    const markdown = this.createMarkdownReport(features, testCases, convertedResults);
     await fs.promises.writeFile(filename, markdown);
     console.log(`📄 Markdown report saved to ${filename}`);
   }
@@ -74,7 +81,7 @@ export class ReportGenerator {
   private createHtmlReport(
     features: DiscoveredFeature[],
     testCases: TestCase[],
-    testResults: TestExecutionResult[],
+    testResults: ReportTestResult[],
   ): string {
     const stats = this.calculateStatistics(features);
     const passed = testResults.filter((r) => r.passed).length;
@@ -181,7 +188,7 @@ export class ReportGenerator {
   private createMarkdownReport(
     features: DiscoveredFeature[],
     testCases: TestCase[],
-    testResults: TestExecutionResult[],
+    testResults: ReportTestResult[],
   ): string {
     const stats = this.calculateStatistics(features);
     const passed = testResults.filter((r) => r.passed).length;
@@ -242,8 +249,16 @@ ${feature.actions ? `- **Actions**: ${feature.actions.join(", ")}` : ""}
   }
 }
 
-interface TestExecutionResult {
+interface ReportTestResult {
   featureName: string;
   passed: boolean;
   error?: string;
+}
+
+function convertTestResults(results: TestResult[]): ReportTestResult[] {
+  return results.map((result) => ({
+    featureName: result.testCase?.feature?.name || 'Unknown',
+    passed: result.success,
+    error: result.error || undefined,
+  }));
 }

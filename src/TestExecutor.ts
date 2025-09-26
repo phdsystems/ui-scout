@@ -1,6 +1,6 @@
 import type { Page } from "@playwright/test";
 import { expect } from "@playwright/test";
-import type { TestCase, TestStep, Assertion } from "./types";
+import type { TestCase, TestStep, Assertion, TestExecutionResult } from "./types";
 import * as fs from "fs";
 import * as path from "path";
 
@@ -209,12 +209,4 @@ export class TestExecutor {
     console.log(`  Success rate: ${((passed / total) * 100).toFixed(1)}%`);
     console.log("=".repeat(50));
   }
-}
-
-export interface TestExecutionResult {
-  testCase: TestCase;
-  success: boolean;
-  duration: number;
-  error: string | null;
-  screenshot: string | null;
 }

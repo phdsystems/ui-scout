@@ -1,7 +1,6 @@
 import type { Page } from "@playwright/test";
-import type { DiscoveredFeature, TestCase } from "./types";
+import type { DiscoveredFeature, TestCase, TestExecutionResult } from "./types";
 import { TestCaseGenerator } from "./TestCaseGenerator";
-import type { TestExecutionResult } from "./TestExecutor";
 import { TestExecutor } from "./TestExecutor";
 import { InputDiscovery } from "./InputDiscovery";
 

@@ -5,7 +5,7 @@ import { InputDiscovery } from "./InputDiscovery";
 import { ComponentDiscovery } from "./ComponentDiscovery";
 import { NavigationDiscovery } from "./NavigationDiscovery";
 import { TestCaseGenerator } from "./TestCaseGenerator";
-import type { TestExecutionResult } from "./TestExecutor";
+import type { TestExecutionResult } from "./types";
 import { TestExecutor } from "./TestExecutor";
 import { ReportGenerator } from "./ReportGenerator";
 
@@ -238,8 +238,8 @@ export class FeatureDiscoveryOrchestrator {
       byType[feature.type] = (byType[feature.type] || 0) + 1;
     }
 
-    const passed = testResults.filter((r) => r.passed).length;
-    const failed = testResults.filter((r) => !r.passed).length;
+    const passed = testResults.filter((r) => r.success).length;
+    const failed = testResults.filter((r) => !r.success).length;
 
     return {
       featuresDiscovered: features.length,
