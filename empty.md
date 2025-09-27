@@ -1,12 +1,12 @@
 # Feature Discovery Report
 
-Generated: 2025-09-27T08:10:27.717Z
+Generated: 2025-09-27T07:05:27.472Z
 
 ## Summary
 
 | Metric | Value |
 |--------|-------|
-| Features Discovered | 2 |
+| Features Discovered | 0 |
 | Test Cases Generated | 0 |
 | Tests Passed | 0 |
 | Tests Failed | 0 |
@@ -14,8 +14,7 @@ Generated: 2025-09-27T08:10:27.717Z
 
 ## Feature Types
 
-- **Panel**: 1
-- **Other**: 1
+
 
 ## Test Results
 
@@ -26,16 +25,5 @@ Generated: 2025-09-27T08:10:27.717Z
 
 
 ## Discovered Features
-
-
-### Dashboard Panel (panel)
-- **Selector**: `.dashboard`
-- **Text**: Dashboard Content
-- **Actions**: screenshot, hover
-
-
-### Simple Element (other)
-- **Selector**: `.element`
-
 
 

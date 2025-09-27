@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feature Discovery Report</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .header { background: #f5f5f5; padding: 20px; border-radius: 8px; }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0; }
+        .stat-card { background: #fff; border: 1px solid #ddd; padding: 15px; border-radius: 8px; text-align: center; }
+        .stat-number { font-size: 2em; font-weight: bold; color: #007cba; }
+        .features-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px; }
+        .feature-card { border: 1px solid #ddd; padding: 15px; border-radius: 8px; background: #fff; }
+        .feature-type { display: inline-block; padding: 4px 8px; background: #007cba; color: white; border-radius: 4px; font-size: 0.8em; }
+        .test-results { margin: 20px 0; }
+        .passed { color: #28a745; }
+        .failed { color: #dc3545; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔍 Feature Discovery Report</h1>
+        <p>Generated: 2025-09-27T07:05:27.447Z</p>
+    </div>
+
+    <div class="stats">
+        <div class="stat-card">
+            <div class="stat-number">15</div>
+            <div>Features Discovered</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">15</div>
+            <div>Test Cases Generated</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">33.3%</div>
+            <div>Success Rate</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">7</div>
+            <div>Interactive Elements</div>
+        </div>
+    </div>
+
+    <h2>📊 Feature Types</h2>
+    <div class="stats">
+        
+            <div class="stat-card">
+                <div class="stat-number">5</div>
+                <div>Buttons</div>
+            </div>
+        
+            <div class="stat-card">
+                <div class="stat-number">5</div>
+                <div>Inputs</div>
+            </div>
+        
+            <div class="stat-card">
+                <div class="stat-number">1</div>
+                <div>Navigations</div>
+            </div>
+        
+            <div class="stat-card">
+                <div class="stat-number">4</div>
+                <div>Others</div>
+            </div>
+        
+    </div>
+
+    <h2>🧪 Test Results</h2>
+    <div class="test-results">
+        <p><span class="passed">✅ Passed: 5</span> | <span class="failed">❌ Failed: 10</span></p>
+        
+            <div class="feature-card">
+                <h4>✅ Submit</h4>
+                <p class="passed">Test passed successfully</p>
+            </div>
+        
+            <div class="feature-card">
+                <h4>❌ Email</h4>
+                <p class="failed">Error: Error 1</p>
+            </div>
+        
+            <div class="feature-card">
+                <h4>❌ Nav</h4>
+                <p class="failed">Error: Error 2</p>
+            </div>
+        
+            <div class="feature-card">
+                <h4>✅ Feature 0</h4>
+                <p class="passed">Test passed successfully</p>
+            </div>
+        
+            <div class="feature-card">
+                <h4>❌ Feature 1</h4>
+                <p class="failed">Error: Error 4</p>
+            </div>
+        
+            <div class="feature-card">
+                <h4>❌ Feature 2</h4>
+                <p class="failed">Error: Error 5</p>
+            </div>
+        
+            <div class="feature-card">
+                <h4>✅ Feature 3</h4>
+                <p class="passed">Test passed successfully</p>
+            </div>
+        
+            <div class="feature-card">
+                <h4>❌ Feature 4</h4>
+                <p class="failed">Error: Error 7</p>
+            </div>
+        
+            <div class="feature-card">
+                <h4>❌ Feature 5</h4>
+                <p class="failed">Error: Error 8</p>
+            </div>
+        
+            <div class="feature-card">
+                <h4>✅ Feature 6</h4>
+                <p class="passed">Test passed successfully</p>
+            </div>
+        
+    </div>
+
+    <h2>📋 Discovered Features</h2>
+    <div class="features-grid">
+        
+            <div class="feature-card">
+                <span class="feature-type">button</span>
+                <h4>Submit</h4>
+                <p><strong>Selector:</strong> <code>#submit</code></p>
+                <p><strong>Text:</strong> Submit</p>
+                <p><strong>Actions:</strong> click, hover</p>
+            </div>
+        
+            <div class="feature-card">
+                <span class="feature-type">input</span>
+                <h4>Email</h4>
+                <p><strong>Selector:</strong> <code>#email</code></p>
+                
+                <p><strong>Actions:</strong> </p>
+            </div>
+        
+            <div class="feature-card">
+                <span class="feature-type">navigation</span>
+                <h4>Nav</h4>
+                <p><strong>Selector:</strong> <code>nav</code></p>
+                <p><strong>Text:</strong> Navigation</p>
+                
+            </div>
+        
+            <div class="feature-card">
+                <span class="feature-type">button</span>
+                <h4>Feature 0</h4>
+                <p><strong>Selector:</strong> <code>#feature-0</code></p>
+                
+                <p><strong>Actions:</strong> </p>
+            </div>
+        
+            <div class="feature-card">
+                <span class="feature-type">input</span>
+                <h4>Feature 1</h4>
+                <p><strong>Selector:</strong> <code>#feature-1</code></p>
+                <p><strong>Text:</strong> Text 1</p>
+                <p><strong>Actions:</strong> action</p>
+            </div>
+        
+            <div class="feature-card">
+                <span class="feature-type">other</span>
+                <h4>Feature 2</h4>
+                <p><strong>Selector:</strong> <code>#feature-2</code></p>
+                <p><strong>Text:</strong> Text 2</p>
+                <p><strong>Actions:</strong> </p>
+            </div>
+        
+            <div class="feature-card">
+                <span class="feature-type">button</span>
+                <h4>Feature 3</h4>
+                <p><strong>Selector:</strong> <code>#feature-3</code></p>
+                
+                <p><strong>Actions:</strong> action</p>
+            </div>
+        
+            <div class="feature-card">
+                <span class="feature-type">input</span>
+                <h4>Feature 4</h4>
+                <p><strong>Selector:</strong> <code>#feature-4</code></p>
+                <p><strong>Text:</strong> Text 4</p>
+                <p><strong>Actions:</strong> </p>
+            </div>
+        
+            <div class="feature-card">
+                <span class="feature-type">other</span>
+                <h4>Feature 5</h4>
+                <p><strong>Selector:</strong> <code>#feature-5</code></p>
+                <p><strong>Text:</strong> Text 5</p>
+                <p><strong>Actions:</strong> action</p>
+            </div>
+        
+            <div class="feature-card">
+                <span class="feature-type">button</span>
+                <h4>Feature 6</h4>
+                <p><strong>Selector:</strong> <code>#feature-6</code></p>
+                
+                <p><strong>Actions:</strong> </p>
+            </div>
+        
+            <div class="feature-card">
+                <span class="feature-type">input</span>
+                <h4>Feature 7</h4>
+                <p><strong>Selector:</strong> <code>#feature-7</code></p>
+                <p><strong>Text:</strong> Text 7</p>
+                <p><strong>Actions:</strong> action</p>
+            </div>
+        
+            <div class="feature-card">
+                <span class="feature-type">other</span>
+                <h4>Feature 8</h4>
+                <p><strong>Selector:</strong> <code>#feature-8</code></p>
+                <p><strong>Text:</strong> Text 8</p>
+                <p><strong>Actions:</strong> </p>
+            </div>
+        
+            <div class="feature-card">
+                <span class="feature-type">button</span>
+                <h4>Feature 9</h4>
+                <p><strong>Selector:</strong> <code>#feature-9</code></p>
+                
+                <p><strong>Actions:</strong> action</p>
+            </div>
+        
+            <div class="feature-card">
+                <span class="feature-type">input</span>
+                <h4>Feature 10</h4>
+                <p><strong>Selector:</strong> <code>#feature-10</code></p>
+                <p><strong>Text:</strong> Text 10</p>
+                <p><strong>Actions:</strong> </p>
+            </div>
+        
+            <div class="feature-card">
+                <span class="feature-type">other</span>
+                <h4>Feature 11</h4>
+                <p><strong>Selector:</strong> <code>#feature-11</code></p>
+                <p><strong>Text:</strong> Text 11</p>
+                <p><strong>Actions:</strong> action</p>
+            </div>
+        
+    </div>
+</body>
+</html>
