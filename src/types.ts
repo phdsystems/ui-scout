@@ -3,6 +3,7 @@ export interface DiscoveredFeature {
   name: string;
   type:
     | "button"
+    | "link"
     | "menu"
     | "panel"
     | "input"

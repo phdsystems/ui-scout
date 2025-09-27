@@ -1,6 +1,6 @@
 # Feature Discovery Report
 
-Generated: 2025-09-27T01:36:27.155Z
+Generated: 2025-09-27T06:49:21.015Z
 
 ## Summary
 
@@ -8,9 +8,9 @@ Generated: 2025-09-27T01:36:27.155Z
 |--------|-------|
 | Features Discovered | 0 |
 | Test Cases Generated | 0 |
-| Tests Passed | 1 |
-| Tests Failed | 1 |
-| Success Rate | 50.0% |
+| Tests Passed | 0 |
+| Tests Failed | 2 |
+| Success Rate | 0.0% |
 
 ## Feature Types
 
@@ -19,10 +19,11 @@ Generated: 2025-09-27T01:36:27.155Z
 ## Test Results
 
 ### Passed Tests ✅
-- Passed Test
+
 
 ### Failed Tests ❌
-- Failed Test: Timeout
+- Unknown: undefined
+- Unknown: Timeout
 
 ## Discovered Features
 

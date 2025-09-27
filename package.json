@@ -1,15 +1,22 @@
 {
   "name": "ui-scout",
-  "version": "1.0.0",
-  "description": "Framework-agnostic automated UI element discovery and test generation for web applications. Works with Playwright, Puppeteer, Selenium, and custom adapters.",
+  "version": "2.0.0",
+  "description": "Comprehensive test generation tool for achieving 100% code coverage. Generates unit, component, and E2E tests using AI-powered analysis.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "bin": {
+    "ui-scout": "./dist/TestGeneratorCLI.js"
+  },
   "files": [
     "dist",
     "README.md"
   ],
   "scripts": {
     "build": "tsc",
+    "generate:all": "bun src/TestGeneratorCLI.ts generate-all",
+    "generate:unit": "bun src/TestGeneratorCLI.ts generate-unit",
+    "generate:e2e": "bun src/TestGeneratorCLI.ts generate-e2e",
+    "analyze:coverage": "bun src/TestGeneratorCLI.ts analyze",
     "dev": "tsx watch src/index.ts",
     "start": "node dist/index.js",
     "test": "vitest",
@@ -56,7 +63,7 @@
     "@types/node": "^20.19.17",
     "@typescript-eslint/eslint-plugin": "^7.18.0",
     "@typescript-eslint/parser": "^7.18.0",
-    "@vitest/coverage-v8": "^3.2.4",
+    "@vitest/coverage-v8": "^1.6.0",
     "@vitest/ui": "^1.6.1",
     "esbuild": "^0.25.10",
     "eslint": "^8.57.1",
@@ -74,5 +81,12 @@
   "bugs": {
     "url": "https://github.com/phdsystems/ui-scout/issues"
   },
-  "homepage": "https://github.com/phdsystems/ui-scout#readme"
+  "homepage": "https://github.com/phdsystems/ui-scout#readme",
+  "dependencies": {
+    "@testing-library/jest-dom": "^6.8.0",
+    "@testing-library/react": "^16.3.0",
+    "@types/glob": "^9.0.0",
+    "commander": "^14.0.1",
+    "glob": "^11.0.3"
+  }
 }

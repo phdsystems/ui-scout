@@ -40,6 +40,26 @@ export { SelectorUtils } from "./SelectorUtils";
 // Main coordinators
 export { FeatureDiscoveryCoordinator } from "./FeatureDiscoveryCoordinator";
 
+// Test Generators for 100% Coverage
+export {
+  IntegrationTestGenerator,
+  E2ETestGenerator,
+  UnifiedTestGenerator,
+  CoverageAnalyzer,
+} from "./generators";
+
+export type {
+  IntegrationTestOptions,
+  GeneratedIntegrationTest,
+  E2ETestOptions,
+  E2ETestScenario,
+  GeneratedE2ETest,
+  UnifiedTestOptions,
+  TestGenerationReport,
+  CoverageGap,
+  CoverageReport,
+} from "./generators";
+
 import { DiscoveryService } from "./DiscoveryService";
 import { PlaywrightPageDriver } from "./adapters/PlaywrightAdapter";
 import { PuppeteerPageDriver } from "./adapters/PuppeteerAdapter";

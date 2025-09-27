@@ -1,0 +1,18 @@
+
+#!/bin/sh
+# .husky/pre-commit
+
+# Run tests with coverage check
+echo "🧪 Running tests with coverage check..."
+bun test --coverage --run
+
+# Check if coverage meets threshold
+coverage_result=$(bun test --coverage --run --reporter=json 2>/dev/null | grep '"pct":' | head -1 | grep -o '[0-9]*' | head -1)
+
+if [ "$coverage_result" -lt 100 ]; then
+  echo "❌ Coverage is below 100% ($coverage_result%)"
+  echo "Please add tests to achieve 100% coverage before committing."
+  exit 1
+fi
+
+echo "✅ Coverage check passed (100%)"

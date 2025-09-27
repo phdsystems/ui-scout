@@ -131,7 +131,7 @@ describe("SelectorUtils", () => {
 
       const selector = await selectorUtils.getUniqueSelector(mockElement);
 
-      // The new fallback logic may generate a different selector format  
+      // The new fallback logic may generate a different selector format
       expect(selector).toContain("a");
       expect(selector).toBeDefined();
     });
