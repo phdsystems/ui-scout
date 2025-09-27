@@ -2,20 +2,20 @@ import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { ComponentDiscovery } from "../src/ComponentDiscovery";
 import { SelectorUtils } from "../src/SelectorUtils";
 import { createMockPage, createMockLocator } from "./mocks/playwright.mock";
-import type { DiscoveredFeature } from "../src/types";
+import type { _DiscoveredFeature } from "../src/types";
 
 describe("ComponentDiscovery - Comprehensive Tests", () => {
   let mockPage: any;
   let componentDiscovery: ComponentDiscovery;
 
   beforeEach(() => {
+    vi.clearAllMocks();
     mockPage = createMockPage();
     componentDiscovery = new ComponentDiscovery(mockPage);
-    vi.clearAllMocks();
-    
+
     // Reset console methods
-    vi.spyOn(console, 'log').mockImplementation(() => {});
-    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    vi.spyOn(console, "log").mockImplementation(() => {});
+    vi.spyOn(console, "warn").mockImplementation(() => {});
   });
 
   afterEach(() => {
@@ -65,17 +65,17 @@ describe("ComponentDiscovery - Comprehensive Tests", () => {
 
     it("should handle different chart types", async () => {
       const mockCanvasChart = createMockLocator({
-        getAttribute: vi.fn((attr) => attr === "id" ? "canvas-chart" : null),
+        getAttribute: vi.fn((attr) => (attr === "id" ? "canvas-chart" : null)),
         isVisible: vi.fn().mockResolvedValue(true),
       });
 
       const mockSvgChart = createMockLocator({
-        getAttribute: vi.fn((attr) => attr === "class" ? "svg chart" : null),
+        getAttribute: vi.fn((attr) => (attr === "class" ? "svg chart" : null)),
         isVisible: vi.fn().mockResolvedValue(true),
       });
 
       const mockTradingViewChart = createMockLocator({
-        getAttribute: vi.fn((attr) => attr === "class" ? "tradingview-widget-container" : null),
+        getAttribute: vi.fn((attr) => (attr === "class" ? "tradingview-widget-container" : null)),
         isVisible: vi.fn().mockResolvedValue(true),
       });
 
@@ -122,7 +122,7 @@ describe("ComponentDiscovery - Comprehensive Tests", () => {
 
     it("should handle empty chart discovery", async () => {
       mockPage.locator.mockImplementation(() => ({
-        all: vi.fn().mockResolvedValue([])
+        all: vi.fn().mockResolvedValue([]),
       }));
 
       const charts = await componentDiscovery.discoverCharts();
@@ -142,16 +142,18 @@ describe("ComponentDiscovery - Comprehensive Tests", () => {
         isVisible: vi.fn().mockResolvedValue(true),
         locator: vi.fn().mockReturnValue({
           first: vi.fn().mockReturnValue({
-            textContent: vi.fn().mockResolvedValue("Dashboard Overview")
-          })
-        })
+            textContent: vi.fn().mockResolvedValue("Dashboard Overview"),
+          }),
+        }),
       });
 
       mockPage.locator.mockImplementation((selector: string) => {
-        if (selector.includes("panel") || selector.includes("card")) {
+        // Handle general panel discovery (returns array via .all())
+        if (selector === ".panel" || selector === ".card" || selector === ".widget" || selector === '[role="region"]' || selector === "aside" || selector === "section" || selector.includes('[class*="card"]') || selector.includes('[class*="widget"]') || selector.includes('[class*="sidebar"]') || selector.includes('[class*="drawer"]')) {
           return { all: vi.fn().mockResolvedValue([mockPanel]) };
         }
-        return { all: vi.fn().mockResolvedValue([]) };
+        // Handle specific panel selector calls (for enhancement) - return the panel directly
+        return mockPanel;
       });
 
       const panels = await componentDiscovery.discoverPanels();
@@ -167,9 +169,9 @@ describe("ComponentDiscovery - Comprehensive Tests", () => {
         isVisible: vi.fn().mockResolvedValue(true),
         locator: vi.fn().mockReturnValue({
           first: vi.fn().mockReturnValue({
-            textContent: vi.fn().mockResolvedValue("Settings Panel")
-          })
-        })
+            textContent: vi.fn().mockResolvedValue("Settings Panel"),
+          }),
+        }),
       });
 
       mockPage.locator.mockImplementation((selector: string) => {
@@ -193,9 +195,9 @@ describe("ComponentDiscovery - Comprehensive Tests", () => {
         isVisible: vi.fn().mockResolvedValue(true),
         locator: vi.fn().mockReturnValue({
           first: vi.fn().mockReturnValue({
-            textContent: vi.fn().mockRejectedValue(new Error("No heading"))
-          })
-        })
+            textContent: vi.fn().mockRejectedValue(new Error("No heading")),
+          }),
+        }),
       });
 
       mockPage.locator.mockImplementation((selector: string) => {
@@ -217,9 +219,9 @@ describe("ComponentDiscovery - Comprehensive Tests", () => {
         isVisible: vi.fn().mockResolvedValue(true),
         locator: vi.fn().mockReturnValue({
           first: vi.fn().mockReturnValue({
-            textContent: vi.fn().mockResolvedValue("")
-          })
-        })
+            textContent: vi.fn().mockResolvedValue(""),
+          }),
+        }),
       });
 
       const mockWidget = createMockLocator({
@@ -227,9 +229,9 @@ describe("ComponentDiscovery - Comprehensive Tests", () => {
         isVisible: vi.fn().mockResolvedValue(true),
         locator: vi.fn().mockReturnValue({
           first: vi.fn().mockReturnValue({
-            textContent: vi.fn().mockResolvedValue("")
-          })
-        })
+            textContent: vi.fn().mockResolvedValue(""),
+          }),
+        }),
       });
 
       const mockAside = createMockLocator({
@@ -237,9 +239,9 @@ describe("ComponentDiscovery - Comprehensive Tests", () => {
         isVisible: vi.fn().mockResolvedValue(true),
         locator: vi.fn().mockReturnValue({
           first: vi.fn().mockReturnValue({
-            textContent: vi.fn().mockResolvedValue("")
-          })
-        })
+            textContent: vi.fn().mockResolvedValue(""),
+          }),
+        }),
       });
 
       mockPage.locator.mockImplementation((selector: string) => {
@@ -288,12 +290,12 @@ describe("ComponentDiscovery - Comprehensive Tests", () => {
 
     it("should discover different modal types", async () => {
       const mockDialogModal = createMockLocator({
-        getAttribute: vi.fn((attr) => attr === "role" ? "dialog" : null),
+        getAttribute: vi.fn((attr) => (attr === "role" ? "dialog" : null)),
         isVisible: vi.fn().mockResolvedValue(true),
       });
 
       const mockClassModal = createMockLocator({
-        getAttribute: vi.fn((attr) => attr === "class" ? "modal" : null),
+        getAttribute: vi.fn((attr) => (attr === "class" ? "modal" : null)),
         isVisible: vi.fn().mockResolvedValue(true),
       });
 
@@ -332,7 +334,7 @@ describe("ComponentDiscovery - Comprehensive Tests", () => {
       const modals = await componentDiscovery.discoverModals();
 
       // Should only include visible modal
-      const visibleModals = modals.filter(m => m.selector.includes("visible"));
+      const visibleModals = modals.filter((m) => m.selector.includes("visible"));
       expect(visibleModals.length).toBeLessThanOrEqual(1);
     });
   });
@@ -390,7 +392,7 @@ describe("ComponentDiscovery - Comprehensive Tests", () => {
 
     it("should handle empty table discovery", async () => {
       mockPage.locator.mockImplementation(() => ({
-        all: vi.fn().mockResolvedValue([])
+        all: vi.fn().mockResolvedValue([]),
       }));
 
       const tables = await componentDiscovery.discoverTables();
@@ -421,7 +423,9 @@ describe("ComponentDiscovery - Comprehensive Tests", () => {
 
       expect(components).toBeDefined();
       expect(Array.isArray(components)).toBe(true);
-      expect(console.log).toHaveBeenCalledWith(expect.stringContaining("Discovering custom components"));
+      expect(console.log).toHaveBeenCalledWith(
+        expect.stringContaining("Discovering custom components"),
+      );
     });
 
     it("should discover web components", async () => {
@@ -431,7 +435,8 @@ describe("ComponentDiscovery - Comprehensive Tests", () => {
       });
 
       mockPage.locator.mockImplementation((selector: string) => {
-        if (selector.includes("-")) { // Web components have hyphens
+        if (selector.includes("-")) {
+          // Web components have hyphens
           return { all: vi.fn().mockResolvedValue([mockWebComponent]) };
         }
         return { all: vi.fn().mockResolvedValue([]) };
@@ -444,7 +449,7 @@ describe("ComponentDiscovery - Comprehensive Tests", () => {
 
     it("should handle no custom components", async () => {
       mockPage.locator.mockImplementation(() => ({
-        all: vi.fn().mockResolvedValue([])
+        all: vi.fn().mockResolvedValue([]),
       }));
 
       const components = await componentDiscovery.discoverCustomComponents();
@@ -477,9 +482,9 @@ describe("ComponentDiscovery - Comprehensive Tests", () => {
 
       // Test via public method that uses the private method
       const components = await componentDiscovery["discoverComponentsBySelectors"](
-        [".test1", ".test2"], 
-        "test", 
-        "Test Component"
+        [".test1", ".test2"],
+        "test",
+        "Test Component",
       );
 
       expect(components.length).toBeGreaterThanOrEqual(0);
@@ -494,9 +499,9 @@ describe("ComponentDiscovery - Comprehensive Tests", () => {
       });
 
       const components = await componentDiscovery["discoverComponentsBySelectors"](
-        [".error", ".valid"], 
-        "test", 
-        "Test Component"
+        [".error", ".valid"],
+        "test",
+        "Test Component",
       );
 
       expect(components).toBeDefined();
@@ -510,13 +515,13 @@ describe("ComponentDiscovery - Comprehensive Tests", () => {
       });
 
       mockPage.locator.mockImplementation(() => ({
-        all: vi.fn().mockResolvedValue([mockElement, mockElement]) // Same element twice
+        all: vi.fn().mockResolvedValue([mockElement, mockElement]), // Same element twice
       }));
 
       const components = await componentDiscovery["discoverComponentsBySelectors"](
-        [".test"], 
-        "test", 
-        "Test Component"
+        [".test"],
+        "test",
+        "Test Component",
       );
 
       // Should deduplicate based on selector
@@ -531,7 +536,7 @@ describe("ComponentDiscovery - Comprehensive Tests", () => {
       });
 
       const charts = await componentDiscovery.discoverCharts();
-      
+
       expect(charts).toBeDefined();
       expect(Array.isArray(charts)).toBe(true);
     });
@@ -543,7 +548,7 @@ describe("ComponentDiscovery - Comprehensive Tests", () => {
       });
 
       mockPage.locator.mockImplementation(() => ({
-        all: vi.fn().mockResolvedValue([mockElement])
+        all: vi.fn().mockResolvedValue([mockElement]),
       }));
 
       const panels = await componentDiscovery.discoverPanels();
@@ -558,7 +563,7 @@ describe("ComponentDiscovery - Comprehensive Tests", () => {
       });
 
       mockPage.locator.mockImplementation(() => ({
-        all: vi.fn().mockResolvedValue([mockElement])
+        all: vi.fn().mockResolvedValue([mockElement]),
       }));
 
       const tables = await componentDiscovery.discoverTables();
@@ -567,15 +572,15 @@ describe("ComponentDiscovery - Comprehensive Tests", () => {
     });
 
     it("should handle large numbers of components", async () => {
-      const largeElementArray = Array.from({ length: 100 }, (_, i) => 
+      const largeElementArray = Array.from({ length: 100 }, (_, i) =>
         createMockLocator({
           getAttribute: vi.fn(() => `element-${i}`),
           isVisible: vi.fn().mockResolvedValue(true),
-        })
+        }),
       );
 
       mockPage.locator.mockImplementation(() => ({
-        all: vi.fn().mockResolvedValue(largeElementArray)
+        all: vi.fn().mockResolvedValue(largeElementArray),
       }));
 
       const startTime = Date.now();
@@ -593,7 +598,7 @@ describe("ComponentDiscovery - Comprehensive Tests", () => {
       });
 
       mockPage.locator.mockImplementation(() => ({
-        all: vi.fn().mockResolvedValue([mockElement])
+        all: vi.fn().mockResolvedValue([mockElement]),
       }));
 
       // Run multiple discoveries
@@ -610,7 +615,7 @@ describe("ComponentDiscovery - Comprehensive Tests", () => {
       });
 
       mockPage.locator.mockImplementation(() => ({
-        all: vi.fn().mockResolvedValue([validElement, null, undefined, validElement])
+        all: vi.fn().mockResolvedValue([validElement, null, undefined, validElement]),
       }));
 
       const modals = await componentDiscovery.discoverModals();
@@ -628,11 +633,12 @@ describe("ComponentDiscovery - Comprehensive Tests", () => {
       });
 
       // Mock SelectorUtils getUniqueSelector
-      vi.spyOn(componentDiscovery["selectorUtils"], 'getUniqueSelector')
-        .mockResolvedValue("#unique-selector");
+      vi.spyOn(componentDiscovery["selectorUtils"], "getUniqueSelector").mockResolvedValue(
+        "#unique-selector",
+      );
 
       mockPage.locator.mockImplementation(() => ({
-        all: vi.fn().mockResolvedValue([mockElement])
+        all: vi.fn().mockResolvedValue([mockElement]),
       }));
 
       const panels = await componentDiscovery.discoverPanels();
@@ -649,11 +655,12 @@ describe("ComponentDiscovery - Comprehensive Tests", () => {
       });
 
       // Mock SelectorUtils to throw error
-      vi.spyOn(componentDiscovery["selectorUtils"], 'getUniqueSelector')
-        .mockRejectedValue(new Error("Selector generation failed"));
+      vi.spyOn(componentDiscovery["selectorUtils"], "getUniqueSelector").mockRejectedValue(
+        new Error("Selector generation failed"),
+      );
 
       mockPage.locator.mockImplementation(() => ({
-        all: vi.fn().mockResolvedValue([mockElement])
+        all: vi.fn().mockResolvedValue([mockElement]),
       }));
 
       const charts = await componentDiscovery.discoverCharts();

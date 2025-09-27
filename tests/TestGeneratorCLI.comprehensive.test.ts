@@ -45,7 +45,7 @@ vi.mock("commander", () => ({
 describe("TestGeneratorCLI", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    
+
     // Setup default mocks
     mockChromium.launch.mockResolvedValue(mockBrowser as any);
     mockPath.resolve.mockImplementation((p) => `/resolved/${p}`);
@@ -54,7 +54,7 @@ describe("TestGeneratorCLI", () => {
     mockFs.readFileSync.mockReturnValue('{"dependencies": {}}');
     mockFs.mkdirSync.mockReturnValue(undefined);
     mockFs.writeFileSync.mockReturnValue(undefined);
-    
+
     // Mock global fetch
     global.fetch = vi.fn().mockResolvedValue({
       ok: true,
@@ -73,7 +73,7 @@ describe("TestGeneratorCLI", () => {
 
       expect(mockProgram.name).toHaveBeenCalledWith("ui-scout");
       expect(mockProgram.description).toHaveBeenCalledWith(
-        "Comprehensive test generation tool for achieving 100% code coverage"
+        "Comprehensive test generation tool for achieving 100% code coverage",
       );
       expect(mockProgram.version).toHaveBeenCalledWith("2.0.0");
     });
@@ -94,17 +94,17 @@ describe("TestGeneratorCLI", () => {
       await import("../src/TestGeneratorCLI");
 
       expect(mockProgram.outputHelp).toHaveBeenCalled();
-      
+
       process.argv = originalArgv;
     });
   });
 
   describe("generate-all command", () => {
-    let actionCallback: Function;
+    let actionCallback: vi.SpyInstance;
 
     beforeEach(async () => {
       await import("../src/TestGeneratorCLI");
-      
+
       // Get the action callback for generate-all command
       const generateAllCalls = mockProgram.action.mock.calls;
       actionCallback = generateAllCalls[0][0]; // First command's action
@@ -133,7 +133,7 @@ describe("TestGeneratorCLI", () => {
       // Mock the imports
       const { CoverageAnalyzer } = await import("../src/CoverageAnalyzer");
       const { UnitTestGenerator } = await import("../src/UnitTestGenerator");
-      
+
       vi.mocked(CoverageAnalyzer).mockImplementation(() => mockAnalyzer as any);
       vi.mocked(UnitTestGenerator).mockImplementation(() => mockUnitGenerator as any);
 
@@ -145,7 +145,7 @@ describe("TestGeneratorCLI", () => {
       expect(mockAnalyzer.analyzeCoverage).toHaveBeenCalled();
       expect(mockUnitGenerator.generateTests).toHaveBeenCalled();
       expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining("🚀 UI Scout - Complete Test Generation")
+        expect.stringContaining("🚀 UI Scout - Complete Test Generation"),
       );
 
       consoleSpy.mockRestore();
@@ -154,7 +154,7 @@ describe("TestGeneratorCLI", () => {
     it("should handle missing coverage data gracefully", async () => {
       const options = {
         project: "/test/project",
-        framework: "vitest", 
+        framework: "vitest",
         target: "100",
         output: "tests/generated",
       };
@@ -170,7 +170,7 @@ describe("TestGeneratorCLI", () => {
 
       const { CoverageAnalyzer } = await import("../src/CoverageAnalyzer");
       const { UnitTestGenerator } = await import("../src/UnitTestGenerator");
-      
+
       vi.mocked(CoverageAnalyzer).mockImplementation(() => mockAnalyzer as any);
       vi.mocked(UnitTestGenerator).mockImplementation(() => mockUnitGenerator as any);
 
@@ -179,7 +179,7 @@ describe("TestGeneratorCLI", () => {
       await actionCallback(options);
 
       expect(consoleSpy).toHaveBeenCalledWith(
-        "No existing coverage data found. Proceeding with full test generation."
+        "No existing coverage data found. Proceeding with full test generation.",
       );
 
       consoleSpy.mockRestore();
@@ -189,7 +189,7 @@ describe("TestGeneratorCLI", () => {
       const options = {
         project: "/test/project",
         framework: "vitest",
-        target: "100", 
+        target: "100",
         output: "tests/generated",
       };
 
@@ -203,10 +203,9 @@ describe("TestGeneratorCLI", () => {
           totalCoverage: { lines: 75.0 },
           gaps: mockGaps,
         }),
-        generateTestsForGaps: vi.fn().mockResolvedValue([
-          "gap test content 1",
-          "gap test content 2",
-        ]),
+        generateTestsForGaps: vi
+          .fn()
+          .mockResolvedValue(["gap test content 1", "gap test content 2"]),
       };
 
       const mockUnitGenerator = {
@@ -215,7 +214,7 @@ describe("TestGeneratorCLI", () => {
 
       const { CoverageAnalyzer } = await import("../src/CoverageAnalyzer");
       const { UnitTestGenerator } = await import("../src/UnitTestGenerator");
-      
+
       vi.mocked(CoverageAnalyzer).mockImplementation(() => mockAnalyzer as any);
       vi.mocked(UnitTestGenerator).mockImplementation(() => mockUnitGenerator as any);
 
@@ -224,15 +223,15 @@ describe("TestGeneratorCLI", () => {
       expect(mockAnalyzer.generateTestsForGaps).toHaveBeenCalledWith(mockGaps);
       expect(mockFs.mkdirSync).toHaveBeenCalledWith(
         "/resolved//test/project/tests/generated/gaps",
-        { recursive: true }
+        { recursive: true },
       );
       expect(mockFs.writeFileSync).toHaveBeenCalledWith(
         "/resolved//test/project/tests/generated/gaps/gap-test-1.test.ts",
-        "gap test content 1"
+        "gap test content 1",
       );
       expect(mockFs.writeFileSync).toHaveBeenCalledWith(
-        "/resolved//test/project/tests/generated/gaps/gap-test-2.test.ts", 
-        "gap test content 2"
+        "/resolved//test/project/tests/generated/gaps/gap-test-2.test.ts",
+        "gap test content 2",
       );
     });
 
@@ -245,9 +244,7 @@ describe("TestGeneratorCLI", () => {
       };
 
       // Mock web app detection
-      mockFs.readFileSync.mockReturnValue(
-        JSON.stringify({ dependencies: { react: "^18.0.0" } })
-      );
+      mockFs.readFileSync.mockReturnValue(JSON.stringify({ dependencies: { react: "^18.0.0" } }));
 
       global.fetch = vi.fn().mockResolvedValue({ ok: true });
 
@@ -277,7 +274,7 @@ describe("TestGeneratorCLI", () => {
 
       const { CoverageAnalyzer } = await import("../src/CoverageAnalyzer");
       const { UnitTestGenerator } = await import("../src/UnitTestGenerator");
-      
+
       vi.mocked(CoverageAnalyzer).mockImplementation(() => mockAnalyzer as any);
       vi.mocked(UnitTestGenerator).mockImplementation(() => mockUnitGenerator as any);
 
@@ -296,9 +293,9 @@ describe("TestGeneratorCLI", () => {
   describe("analyze command", () => {
     it("should analyze coverage and output report", async () => {
       await import("../src/TestGeneratorCLI");
-      
+
       const analyzeCallback = mockProgram.action.mock.calls[1][0]; // Second command's action
-      
+
       const mockAnalyzer = {
         analyzeCoverage: vi.fn().mockResolvedValue({
           totalCoverage: { lines: 89.5, functions: 92.1, branches: 85.3 },
@@ -315,12 +312,8 @@ describe("TestGeneratorCLI", () => {
       await analyzeCallback(options);
 
       expect(mockAnalyzer.analyzeCoverage).toHaveBeenCalled();
-      expect(consoleSpy).toHaveBeenCalledWith(
-        "\n📊 Coverage Analysis Complete"
-      );
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining("totalCoverage")
-      );
+      expect(consoleSpy).toHaveBeenCalledWith("\n📊 Coverage Analysis Complete");
+      expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining("totalCoverage"));
 
       consoleSpy.mockRestore();
     });
@@ -329,15 +322,13 @@ describe("TestGeneratorCLI", () => {
   describe("generate-unit command", () => {
     it("should generate unit tests only", async () => {
       await import("../src/TestGeneratorCLI");
-      
+
       const unitCallback = mockProgram.action.mock.calls[2][0]; // Third command's action
-      
+
       const mockUnitGenerator = {
-        generateTests: vi.fn().mockResolvedValue([
-          "unit1.test.ts",
-          "unit2.test.ts", 
-          "unit3.test.ts",
-        ]),
+        generateTests: vi
+          .fn()
+          .mockResolvedValue(["unit1.test.ts", "unit2.test.ts", "unit3.test.ts"]),
       };
 
       const { UnitTestGenerator } = await import("../src/UnitTestGenerator");
@@ -350,7 +341,7 @@ describe("TestGeneratorCLI", () => {
         framework: "vitest",
         output: "tests/unit",
       };
-      
+
       await unitCallback(options);
 
       expect(mockUnitGenerator.generateTests).toHaveBeenCalled();
@@ -363,9 +354,9 @@ describe("TestGeneratorCLI", () => {
   describe("generate-e2e command", () => {
     it("should generate E2E tests with custom URL", async () => {
       await import("../src/TestGeneratorCLI");
-      
+
       const e2eCallback = mockProgram.action.mock.calls[3][0]; // Fourth command's action
-      
+
       const mockCoordinator = {
         discoverFeatures: vi.fn().mockResolvedValue({
           features: [
@@ -381,9 +372,7 @@ describe("TestGeneratorCLI", () => {
               { action: "fill", selector: "#password", value: "testpass" },
               { action: "click", selector: "button[type=submit]" },
             ],
-            assertions: [
-              { selector: ".dashboard", type: "toBeVisible" },
-            ],
+            assertions: [{ selector: ".dashboard", type: "toBeVisible" }],
           },
         ]),
       };
@@ -398,7 +387,7 @@ describe("TestGeneratorCLI", () => {
         url: "http://localhost:5173",
         output: "tests/e2e",
       };
-      
+
       await e2eCallback(options);
 
       expect(mockPage.goto).toHaveBeenCalledWith("http://localhost:5173", {
@@ -406,9 +395,7 @@ describe("TestGeneratorCLI", () => {
       });
       expect(mockCoordinator.discoverFeatures).toHaveBeenCalled();
       expect(mockCoordinator.generateTests).toHaveBeenCalled();
-      expect(consoleSpy).toHaveBeenCalledWith(
-        "✅ Generated E2E tests with 1 test cases"
-      );
+      expect(consoleSpy).toHaveBeenCalledWith("✅ Generated E2E tests with 1 test cases");
 
       consoleSpy.mockRestore();
     });
@@ -420,14 +407,14 @@ describe("TestGeneratorCLI", () => {
         mockFs.readFileSync.mockReturnValue(
           JSON.stringify({
             dependencies: { react: "^18.0.0", "react-dom": "^18.0.0" },
-          })
+          }),
         );
 
         global.fetch = vi.fn().mockResolvedValue({ ok: true });
 
         // Import after setting up mocks
-        const cliModule = await import("../src/TestGeneratorCLI");
-        
+        const _cliModule = await import("../src/TestGeneratorCLI");
+
         // Access the checkForWebApp function through module evaluation
         // Since it's not exported, we test it indirectly through the generate-all command
         const options = {
@@ -447,7 +434,7 @@ describe("TestGeneratorCLI", () => {
 
         const { CoverageAnalyzer } = await import("../src/CoverageAnalyzer");
         const { UnitTestGenerator } = await import("../src/UnitTestGenerator");
-        
+
         vi.mocked(CoverageAnalyzer).mockImplementation(() => mockAnalyzer as any);
         vi.mocked(UnitTestGenerator).mockImplementation(() => mockUnitGenerator as any);
 
@@ -459,16 +446,14 @@ describe("TestGeneratorCLI", () => {
 
         expect(global.fetch).toHaveBeenCalledWith("http://localhost:3000");
         expect(consoleSpy).toHaveBeenCalledWith(
-          "Web application detected. Generating E2E tests..."
+          "Web application detected. Generating E2E tests...",
         );
 
         consoleSpy.mockRestore();
       });
 
       it("should fallback to Vite port when main port fails", async () => {
-        mockFs.readFileSync.mockReturnValue(
-          JSON.stringify({ dependencies: { vue: "^3.0.0" } })
-        );
+        mockFs.readFileSync.mockReturnValue(JSON.stringify({ dependencies: { vue: "^3.0.0" } }));
 
         global.fetch = vi
           .fn()
@@ -492,7 +477,7 @@ describe("TestGeneratorCLI", () => {
 
         const { CoverageAnalyzer } = await import("../src/CoverageAnalyzer");
         const { UnitTestGenerator } = await import("../src/UnitTestGenerator");
-        
+
         vi.mocked(CoverageAnalyzer).mockImplementation(() => mockAnalyzer as any);
         vi.mocked(UnitTestGenerator).mockImplementation(() => mockUnitGenerator as any);
 
@@ -508,9 +493,7 @@ describe("TestGeneratorCLI", () => {
       });
 
       it("should return false when no web framework and no server", async () => {
-        mockFs.readFileSync.mockReturnValue(
-          JSON.stringify({ dependencies: { lodash: "^4.0.0" } })
-        );
+        mockFs.readFileSync.mockReturnValue(JSON.stringify({ dependencies: { lodash: "^4.0.0" } }));
 
         global.fetch = vi.fn().mockRejectedValue(new Error("Connection refused"));
 
@@ -531,7 +514,7 @@ describe("TestGeneratorCLI", () => {
 
         const { CoverageAnalyzer } = await import("../src/CoverageAnalyzer");
         const { UnitTestGenerator } = await import("../src/UnitTestGenerator");
-        
+
         vi.mocked(CoverageAnalyzer).mockImplementation(() => mockAnalyzer as any);
         vi.mocked(UnitTestGenerator).mockImplementation(() => mockUnitGenerator as any);
 
@@ -541,7 +524,7 @@ describe("TestGeneratorCLI", () => {
         await actionCallback(options);
 
         expect(consoleSpy).toHaveBeenCalledWith(
-          "No running web application found. Skipping E2E test generation."
+          "No running web application found. Skipping E2E test generation.",
         );
 
         consoleSpy.mockRestore();
@@ -569,7 +552,7 @@ describe("TestGeneratorCLI", () => {
 
         const { CoverageAnalyzer } = await import("../src/CoverageAnalyzer");
         const { UnitTestGenerator } = await import("../src/UnitTestGenerator");
-        
+
         vi.mocked(CoverageAnalyzer).mockImplementation(() => mockAnalyzer as any);
         vi.mocked(UnitTestGenerator).mockImplementation(() => mockUnitGenerator as any);
 
@@ -580,10 +563,10 @@ describe("TestGeneratorCLI", () => {
 
         expect(mockFs.writeFileSync).toHaveBeenCalledWith(
           "/resolved//test/project/vitest.config.ts",
-          expect.stringContaining("defineConfig")
+          expect.stringContaining("defineConfig"),
         );
         expect(consoleSpy).toHaveBeenCalledWith(
-          "✅ Generated vitest configuration with 100% coverage target"
+          "✅ Generated vitest configuration with 100% coverage target",
         );
 
         consoleSpy.mockRestore();
@@ -609,7 +592,7 @@ describe("TestGeneratorCLI", () => {
 
         const { CoverageAnalyzer } = await import("../src/CoverageAnalyzer");
         const { UnitTestGenerator } = await import("../src/UnitTestGenerator");
-        
+
         vi.mocked(CoverageAnalyzer).mockImplementation(() => mockAnalyzer as any);
         vi.mocked(UnitTestGenerator).mockImplementation(() => mockUnitGenerator as any);
 
@@ -618,7 +601,7 @@ describe("TestGeneratorCLI", () => {
 
         expect(mockFs.writeFileSync).toHaveBeenCalledWith(
           "/resolved//test/project/jest.config.js",
-          expect.stringContaining("module.exports")
+          expect.stringContaining("module.exports"),
         );
       });
 
@@ -642,7 +625,7 @@ describe("TestGeneratorCLI", () => {
 
         const { CoverageAnalyzer } = await import("../src/CoverageAnalyzer");
         const { UnitTestGenerator } = await import("../src/UnitTestGenerator");
-        
+
         vi.mocked(CoverageAnalyzer).mockImplementation(() => mockAnalyzer as any);
         vi.mocked(UnitTestGenerator).mockImplementation(() => mockUnitGenerator as any);
 
@@ -651,9 +634,7 @@ describe("TestGeneratorCLI", () => {
         const actionCallback = mockProgram.action.mock.calls[0][0];
         await actionCallback(options);
 
-        expect(consoleSpy).toHaveBeenCalledWith(
-          "Test configuration already exists. Skipping..."
-        );
+        expect(consoleSpy).toHaveBeenCalledWith("Test configuration already exists. Skipping...");
 
         consoleSpy.mockRestore();
       });
@@ -681,9 +662,7 @@ describe("TestGeneratorCLI", () => {
               { action: "check", selector: "#notifications" },
               { action: "select", selector: "#theme", value: "dark" },
             ],
-            assertions: [
-              { selector: ".settings-page", type: "toBeVisible" },
-            ],
+            assertions: [{ selector: ".settings-page", type: "toBeVisible" }],
           },
         ];
 
@@ -706,12 +685,12 @@ describe("TestGeneratorCLI", () => {
 
         await e2eCallback(options);
 
-        const writeCall = mockFs.writeFileSync.mock.calls.find(call => 
-          call[0].includes("app.e2e.test.ts")
+        const writeCall = mockFs.writeFileSync.mock.calls.find((call) =>
+          call[0].includes("app.e2e.test.ts"),
         );
-        
+
         expect(writeCall).toBeDefined();
-        const generatedCode = writeCall![1] as string;
+        const generatedCode = writeCall[1] as string;
 
         expect(generatedCode).toContain("test('Login Test'");
         expect(generatedCode).toContain("test('Navigation Test'");
@@ -720,7 +699,9 @@ describe("TestGeneratorCLI", () => {
         expect(generatedCode).toContain("await page.check('#notifications');");
         expect(generatedCode).toContain("await page.selectOption('#theme', 'dark');");
         expect(generatedCode).toContain("await expect(page.locator('.dashboard')).toBeVisible();");
-        expect(generatedCode).toContain("await expect(page.locator('.welcome')).toContainText('Welcome');");
+        expect(generatedCode).toContain(
+          "await expect(page.locator('.welcome')).toContainText('Welcome');",
+        );
       });
     });
   });
@@ -737,9 +718,7 @@ describe("TestGeneratorCLI", () => {
       };
 
       // Mock web app detection to trigger E2E generation
-      mockFs.readFileSync.mockReturnValue(
-        JSON.stringify({ dependencies: { react: "^18.0.0" } })
-      );
+      mockFs.readFileSync.mockReturnValue(JSON.stringify({ dependencies: { react: "^18.0.0" } }));
       global.fetch = vi.fn().mockResolvedValue({ ok: true });
 
       const mockAnalyzer = {
@@ -752,7 +731,7 @@ describe("TestGeneratorCLI", () => {
 
       const { CoverageAnalyzer } = await import("../src/CoverageAnalyzer");
       const { UnitTestGenerator } = await import("../src/UnitTestGenerator");
-      
+
       vi.mocked(CoverageAnalyzer).mockImplementation(() => mockAnalyzer as any);
       vi.mocked(UnitTestGenerator).mockImplementation(() => mockUnitGenerator as any);
 
@@ -782,7 +761,7 @@ describe("TestGeneratorCLI", () => {
 
       const { CoverageAnalyzer } = await import("../src/CoverageAnalyzer");
       const { UnitTestGenerator } = await import("../src/UnitTestGenerator");
-      
+
       vi.mocked(CoverageAnalyzer).mockImplementation(() => mockAnalyzer as any);
       vi.mocked(UnitTestGenerator).mockImplementation(() => mockUnitGenerator as any);
 
@@ -794,7 +773,7 @@ describe("TestGeneratorCLI", () => {
       await actionCallback(options);
 
       expect(consoleSpy).toHaveBeenCalledWith(
-        "No running web application found. Skipping E2E test generation."
+        "No running web application found. Skipping E2E test generation.",
       );
 
       consoleSpy.mockRestore();
@@ -827,7 +806,7 @@ describe("TestGeneratorCLI", () => {
 
       const { CoverageAnalyzer } = await import("../src/CoverageAnalyzer");
       const { UnitTestGenerator } = await import("../src/UnitTestGenerator");
-      
+
       vi.mocked(CoverageAnalyzer).mockImplementation(() => mockAnalyzer as any);
       vi.mocked(UnitTestGenerator).mockImplementation(() => mockUnitGenerator as any);
 
