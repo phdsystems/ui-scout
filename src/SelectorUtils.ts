@@ -29,21 +29,66 @@ export class SelectorUtils {
       const textSelector = await this.getTextSelector(element);
       if (textSelector) return textSelector;
 
-      // Fallback: try to get index-based selector
+      // Fallback: try to get a more specific selector with parent context
       const tagName = await element
         .evaluate((el: HTMLElement) => el.tagName.toLowerCase())
         .catch(() => "button");
-      const index = await element
-        .evaluateHandle((el: HTMLElement) => {
-          const parent = el.parentElement;
-          if (!parent) return 0;
-          const siblings = Array.from(parent.querySelectorAll(el.tagName));
-          return siblings.indexOf(el);
-        })
-        .then((handle) => handle.jsonValue())
-        .catch(() => 0);
 
-      return `${tagName}:nth-of-type(${index + 1})`;
+      // Try to find a unique parent container
+      const parentSelector = await element
+        .evaluate((el: HTMLElement) => {
+          let current = el.parentElement;
+          while (current) {
+            // Look for containers with meaningful classes or IDs
+            if (current.id) return `#${current.id}`;
+            if (current.classList.length > 0) {
+              const classes = Array.from(current.classList);
+              const meaningfulClasses = classes.filter(
+                (c) =>
+                  c.includes("nav") ||
+                  c.includes("menu") ||
+                  c.includes("toolbar") ||
+                  c.includes("panel") ||
+                  c.includes("container") ||
+                  c.includes("header"),
+              );
+              if (meaningfulClasses.length > 0) {
+                return `.${meaningfulClasses[0]}`;
+              }
+            }
+            current = current.parentElement;
+          }
+          return null;
+        })
+        .catch(() => null);
+
+      if (parentSelector) {
+        // Get position within the parent container
+        const indexInParent = await element
+          .evaluate((el: HTMLElement, parentSel: string) => {
+            const parent = document.querySelector(parentSel);
+            if (!parent) return 0;
+            const siblings = Array.from(parent.querySelectorAll(el.tagName));
+            return siblings.indexOf(el);
+          }, parentSelector)
+          .catch(() => 0);
+
+        return `${parentSelector} ${tagName}:nth-of-type(${indexInParent + 1})`;
+      }
+
+      // Last resort: use title, aria-label, or text as attribute selector
+      const title = await element.getAttribute("title").catch(() => null);
+      const ariaLabel = await element.getAttribute("aria-label").catch(() => null);
+      const textContent = await element.textContent().catch(() => "");
+
+      if (title) return `${tagName}[title="${title}"]`;
+      if (ariaLabel) return `${tagName}[aria-label="${ariaLabel}"]`;
+      if (textContent && textContent.length < 30) {
+        return `${tagName}:has-text("${textContent.trim()}")`;
+      }
+
+      // Final fallback - this should rarely be reached now
+      return `${tagName}:first-of-type`;
     } catch (e) {
       // Return a basic selector as fallback
       return "button:first-of-type";
@@ -77,7 +122,23 @@ export class SelectorUtils {
     const text = await element.textContent();
 
     if (text && (tagName === "button" || tagName === "a")) {
-      return `${tagName}:has-text("${text.substring(0, 30)}")`;
+      const cleanText = text.trim();
+      if (cleanText.length === 0) return null;
+
+      // Try full text first if it's reasonable length
+      if (cleanText.length <= 50) {
+        const selector = `${tagName}:has-text("${cleanText}")`;
+        const count = await this.page.locator(selector).count();
+        if (count === 1) return selector;
+      }
+
+      // Try first 20 characters if full text isn't unique
+      if (cleanText.length > 10) {
+        const shortText = cleanText.substring(0, 20);
+        const selector = `${tagName}:has-text("${shortText}")`;
+        const count = await this.page.locator(selector).count();
+        if (count === 1) return selector;
+      }
     }
     return null;
   }

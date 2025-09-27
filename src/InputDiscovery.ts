@@ -71,6 +71,7 @@ export class InputDiscovery {
         name: label || placeholder || name || id || `Input (${type})`,
         type: "input",
         selector: uniqueSelector,
+        inputType: type, // Add explicit inputType field
         attributes: {
           type: type,
           placeholder: placeholder || "",

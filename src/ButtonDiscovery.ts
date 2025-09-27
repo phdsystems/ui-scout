@@ -54,6 +54,9 @@ export class ButtonDiscovery {
       const isVisible = await element.isVisible({ timeout: 1000 });
       if (!isVisible) return null;
 
+      const isEnabled = await element.isEnabled({ timeout: 1000 });
+      if (!isEnabled) return null; // Skip disabled buttons
+
       const text = (await element.textContent()) || "";
       const title = await element.getAttribute("title");
       const ariaLabel = await element.getAttribute("aria-label");

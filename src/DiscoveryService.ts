@@ -210,9 +210,35 @@ export class DiscoveryService {
   /**
    * Discover only essential interactive elements for quick testing
    * Much faster than full discovery - typically < 2 seconds
+   * @param options Configuration for discovery limits and behavior
    */
-  async discoverEssentials(): Promise<DiscoveredFeature[]> {
+  async discoverEssentials(
+    options: {
+      maxElementsPerType?: number;
+      maxTotalElements?: number;
+      adaptive?: boolean;
+    } = {},
+  ): Promise<DiscoveredFeature[]> {
+    // Set dynamic limits based on options
+    const {
+      adaptive = false,
+      maxElementsPerType = adaptive ? undefined : 10,
+      maxTotalElements = adaptive ? 100 : 50,
+    } = options;
+
     console.log("⚡ Running essential discovery (fast mode)...");
+    console.log(
+      `DEBUG: maxElementsPerType=${maxElementsPerType}, maxTotalElements=${maxTotalElements}, adaptive=${adaptive}`,
+    );
+    if (adaptive) {
+      console.log("🧠 Using adaptive discovery - will find more elements if needed");
+    } else if (maxElementsPerType === undefined && maxTotalElements === undefined) {
+      console.log("🚀 Unlimited discovery - will find ALL visible elements");
+    } else {
+      console.log(
+        `📊 Limited discovery - max ${maxElementsPerType} per type, ${maxTotalElements} total`,
+      );
+    }
 
     const essentials: DiscoveredFeature[] = [];
     const seenSelectors = new Set<string>();
@@ -232,8 +258,32 @@ export class DiscoveryService {
       try {
         const elements = await this.page.locator(selector).all();
 
-        // Limit to first 10 of each type for speed
-        for (const element of elements.slice(0, 10)) {
+        // Dynamic element limiting
+        let elementsToProcess;
+        if (adaptive) {
+          // Adaptive mode: process more elements if we haven't found enough yet
+          const currentCount = essentials.length;
+          const targetForThisType = Math.max(
+            5,
+            Math.min(
+              20,
+              Math.floor(
+                (maxTotalElements - currentCount) /
+                  (selectors.length - selectors.indexOf(selector)),
+              ),
+            ),
+          );
+          elementsToProcess = elements.slice(0, targetForThisType);
+        } else {
+          // Fixed limit mode
+          elementsToProcess = maxElementsPerType ? elements.slice(0, maxElementsPerType) : elements;
+        }
+
+        for (const element of elementsToProcess) {
+          // Stop if we've reached the total limit
+          if (maxTotalElements && essentials.length >= maxTotalElements) {
+            break;
+          }
           try {
             const tagName = await element.evaluate((el) => el.tagName.toLowerCase());
             const text = (await element.textContent()) || "";
@@ -286,10 +336,45 @@ export class DiscoveryService {
       } catch (e) {
         // Continue with next selector
       }
+
+      // Stop processing more selectors if we've reached the total limit
+      if (maxTotalElements && essentials.length >= maxTotalElements) {
+        break;
+      }
     }
 
     console.log(`✅ Found ${essentials.length} essential elements`);
     return essentials;
+  }
+
+  /**
+   * Discover essential elements with adaptive limits - finds more elements when needed
+   */
+  async discoverEssentialsAdaptive(): Promise<DiscoveredFeature[]> {
+    return this.discoverEssentials({ adaptive: true });
+  }
+
+  /**
+   * Discover essential elements with no limits - finds all visible elements
+   */
+  async discoverEssentialsUnlimited(): Promise<DiscoveredFeature[]> {
+    return this.discoverEssentials({
+      maxElementsPerType: undefined,
+      maxTotalElements: undefined,
+    });
+  }
+
+  /**
+   * Discover essential elements with custom limits
+   */
+  async discoverEssentialsCustom(
+    maxPerType: number,
+    maxTotal: number,
+  ): Promise<DiscoveredFeature[]> {
+    return this.discoverEssentials({
+      maxElementsPerType: maxPerType,
+      maxTotalElements: maxTotal,
+    });
   }
 
   /**

@@ -89,7 +89,14 @@ export class TestCaseGenerator {
     steps: TestStep[],
     assertions: Assertion[],
   ): void {
-    const inputType = feature.attributes?.type || "text";
+    const inputType = feature.attributes?.type || feature.inputType || "text";
+
+    // Skip checkbox and radio inputs - they should use check/click actions
+    if (inputType === "checkbox" || inputType === "radio") {
+      this.addCheckSteps(feature, steps, assertions);
+      return;
+    }
+
     const testValue =
       this.inputDiscovery?.getTestValueForInput(inputType) || this.getDefaultTestValue(inputType);
 
@@ -202,6 +209,13 @@ export class TestCaseGenerator {
         return "12:00";
       case "search":
         return "test search query";
+      case "color":
+        return "#FF0000";
+      case "range":
+        return "50";
+      case "checkbox":
+      case "radio":
+        return ""; // These should use check/click actions, not fill
       default:
         return "Test Value";
     }
